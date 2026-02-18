@@ -13,6 +13,21 @@ services:
     command: server /data --console-address ":9001"
     restart: unless-stopped
 
+  minio-init:
+    image: minio/mc:latest
+    container_name: rip2026-minio-init
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      mc alias set myminio http://minio:9000 minio minio124;
+      mc mb myminio/test --ignore-existing;
+      mc anonymous set download myminio/test;
+      echo 'Bucket test is now public';
+      "
+    restart: "no"
+
   postgres:
     image: postgres:17
     container_name: rip2026-postgres
