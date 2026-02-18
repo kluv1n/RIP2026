@@ -1,0 +1,40 @@
+<html lang="ru">
+    <head>
+        <title>Аккумуляторы и расчёт времени работы — Типы аккумуляторов</title>
+        <link rel="stylesheet" href="/static/styles/index_style.css?v=alfa">
+    </head>
+    <header>
+        <a href="/" class="header-logo" aria-label="На главную">
+            <img src="/static/img/logo.svg" alt="А" class="header-logo__img">
+        </a>
+        <form action="/" method="GET">
+            <input type="text" name="query" class="search-input" placeholder="Поиск по типу аккумулятора" value="{{ .query }}">
+            <button type="submit" class="search-btn">Найти</button>
+        </form>
+    </header>
+    <div class="space">
+        {{ range .applications }}
+        <a href="/application/{{ .ID }}" class="application-card">
+            <div class="application-card__title">{{ .Title }}</div>
+            <div class="application-card__id">
+                Заявка: <span class="application-card__link">№ {{ .ID }}</span>
+            </div>
+            <div class="application-card__info">
+                <span>Расчётов в заявке: <strong>{{ .ItemCount }}</strong></span>
+                <span>Результат: <span class="application-card__badge">время работы (ч) по строкам</span></span>
+            </div>
+        </a>
+        {{ end }}
+        <div class="container">
+            {{ range .batteries }}
+            <a href="/battery/{{ .ID }}" class="card">
+                <div class="card-accent-bar"></div>
+                <img src="http://localhost:9000/test/{{ .Photo }}" alt="img">
+                <h1>{{ .Title }}</h1>
+                <p class="card__employees">Ёмкость: {{ .CapacityMah }} мА·ч, {{ .VoltageV }} В</p>
+                <p class="card__description">{{ .ShortDescription }}</p>
+            </a>
+            {{ end }}
+        </div>
+    </div>
+</html>

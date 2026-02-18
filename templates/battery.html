@@ -1,0 +1,36 @@
+<html lang="ru">
+    <head>
+        <title>{{ .battery.Title }} — Подробная информация</title>
+        <link rel="stylesheet" href="/static/styles/index_style.css?v=alfa">
+    </head>
+    <header class="header-center">
+        <a href="/" class="header-logo" aria-label="На главную">
+            <img src="/static/img/logo.svg" alt="А" class="header-logo__img">
+        </a>
+    </header>
+    <div class="detail-wrapper">
+        <a href="/" class="back-link">← Вернуться к списку типов аккумуляторов</a>
+        <div class="detail-card">
+            <div class="card-accent-bar"></div>
+            <video class="detail-card__video" controls autoplay muted loop>
+                <source src="http://localhost:9000/test/{{ .battery.Video }}" type="video/mp4">
+            </video>
+            <div class="detail-card__body">
+                <h1 class="detail-card__title">{{ .battery.Title }}</h1>
+                <p class="detail-card__employees">Ёмкость: {{ .battery.CapacityMah }} мА·ч, напряжение: {{ .battery.VoltageV }} В</p>
+                <p class="detail-card__description">{{ .battery.Description }}</p>
+                {{ if .hasInApplication }}
+                <hr class="detail-card__separator">
+                <h2 class="detail-card__section-title">Расчёт в заявке</h2>
+                <div class="manager-block">
+                    <div class="manager-block__name">Потребляемый ток: {{ .appItem.CurrentMa }} мА</div>
+                    <div class="manager-block__meta">
+                        <span><strong>Время работы:</strong> {{ printf "%.2f" .appItem.RuntimeHours }} ч</span>
+                        <span><strong>Формула:</strong> {{ .battery.CapacityMah }} мА·ч / {{ .appItem.CurrentMa }} мА</span>
+                    </div>
+                </div>
+                {{ end }}
+            </div>
+        </div>
+    </div>
+</html>

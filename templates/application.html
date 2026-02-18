@@ -1,0 +1,54 @@
+<html lang="ru">
+    <head>
+        <title>Заявка № {{ .app.ID }} — {{ .app.Title }}</title>
+        <link rel="stylesheet" href="/static/styles/index_style.css?v=alfa">
+    </head>
+    <header class="header-center">
+        <a href="/" class="header-logo" aria-label="На главную">
+            <img src="/static/img/logo.svg" alt="А" class="header-logo__img">
+        </a>
+    </header>
+    <div class="application-detail">
+        <a href="/" class="back-link">← Вернуться к списку типов аккумуляторов</a>
+        <div class="application-detail__header-card">
+            <h1 class="application-detail__title">Заявка № {{ .app.ID }} — {{ .app.Title }}</h1>
+            <div class="application-detail__info">
+                <div class="application-detail__info-item"><strong>ID заявки:</strong> {{ .app.ID }}</div>
+                <div class="application-detail__info-item"><strong>Описание:</strong> {{ .app.Description }}</div>
+                <div class="application-detail__info-item"><strong>Количество расчётов:</strong> {{ .app.ItemCount }}</div>
+            </div>
+            <div class="application-detail__salary-result">
+                Результат: время работы {{ .runtimeSummary }}
+            </div>
+        </div>
+
+        <table class="app-table">
+            <thead>
+                <tr>
+                    <th class="app-table__col-photo">Фото</th>
+                    <th>Тип аккумулятора</th>
+                    <th>Ёмкость (мА·ч)</th>
+                    <th>Напряжение (В)</th>
+                    <th>Ток устройства (мА)</th>
+                    <th>Время работы (ч)</th>
+                    <th>м-м (комментарий)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .app.Items }}
+                <tr>
+                    <td class="app-table__col-photo">
+                        <img src="http://localhost:9000/test/{{ .Battery.Photo }}" alt="img">
+                    </td>
+                    <td>{{ .Battery.Title }}</td>
+                    <td>{{ .Battery.CapacityMah }}</td>
+                    <td>{{ .Battery.VoltageV }}</td>
+                    <td><input type="text" value="{{ .CurrentMa }}" readonly class="role-input"></td>
+                    <td class="app-table__col-salary">{{ printf "%.2f" .RuntimeHours }}</td>
+                    <td><input type="text" value="—" readonly class="role-input"></td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+</html>
