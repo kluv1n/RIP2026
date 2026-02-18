@@ -22,23 +22,40 @@
             </div>
         </div>
 
-        <div class="application-items">
-            {{ range .app.Items }}
-            <div class="application-item-card">
-                <div class="application-item-card__fields">
-                    <img src="http://localhost:9000/test/{{ .Battery.Photo }}" alt="img" class="application-item-card__photo">
-                    <span class="application-item-card__field">{{ .Battery.Title }}</span>
-                    <span class="application-item-card__field">{{ .Battery.CapacityMah }} мА·ч</span>
-                    <span class="application-item-card__field">{{ .Battery.VoltageV }} В</span>
-                    <span class="application-item-card__field">{{ .CurrentMa }} мА</span>
-                    <span class="application-item-card__field">{{ printf "%.2f" .RuntimeHours }} ч</span>
-                </div>
-                <div class="application-item-card__mm">
-                    <label class="application-item-card__mm-label">м-м</label>
-                    <input type="text" value="{{ .Mm }}" readonly class="role-input" title="количество/порядок/главный/комментарий">
-                </div>
-            </div>
-            {{ end }}
-        </div>
+        <table class="app-table">
+            <thead>
+                <tr>
+                    <th class="app-table__col-photo">Фото</th>
+                    <th>Тип аккумулятора</th>
+                    <th>Ёмкость (мА·ч)</th>
+                    <th>Напряжение (В)</th>
+                    <th>Ток (мА)</th>
+                    <th>Время (ч/шт)</th>
+                    <th>Итого (ч)</th>
+                    <th>м-м</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .app.Items }}
+                <tr>
+                    <td class="app-table__col-photo">
+                        <img src="http://localhost:9000/test/{{ .Battery.Photo }}" alt="img">
+                    </td>
+                    <td>{{ .Battery.Title }}</td>
+                    <td>{{ .Battery.CapacityMah }}</td>
+                    <td>{{ .Battery.VoltageV }}</td>
+                    <td>{{ .CurrentMa }}</td>
+                    <td>{{ printf "%.2f" .RuntimeHours }}</td>
+                    <td class="app-table__col-salary">{{ printf "%.2f" .RuntimeTotal }}</td>
+                    <td><input type="text" value="{{ .Mm }}" readonly class="role-input" title="количество/порядок/главный/комментарий"></td>
+                </tr>
+                {{ end }}
+                <tr class="app-table__total-row">
+                    <td colspan="6" class="app-table__total-label">Результат (сумма):</td>
+                    <td class="app-table__col-salary app-table__total-value">{{ printf "%.2f" .app.TotalRuntimeHours }} ч</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </html>
