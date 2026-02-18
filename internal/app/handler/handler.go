@@ -79,14 +79,7 @@ func (h *Handler) GetApplication(ctx *gin.Context) {
 	}
 
 	ctx.HTML(http.StatusOK, "application.html", gin.H{
-		"app":             app,
-		"runtimeSummary": fmt.Sprintf("%.1f ч (по строкам ниже)", firstRuntimeOrZero(app)),
+		"app":            app,
+		"runtimeSummary": fmt.Sprintf("%.2f ч (сумма по всем аккумуляторам)", app.TotalRuntimeHours),
 	})
-}
-
-func firstRuntimeOrZero(app repository.Application) float64 {
-	if len(app.Items) == 0 {
-		return 0
-	}
-	return app.Items[0].RuntimeHours
 }

@@ -20,7 +20,6 @@ func StartServer() {
 	h := handler.NewHandler(repo)
 
 	r := gin.Default()
-
 	r.LoadHTMLGlob("templates/*")
 	r.Static("/static", "./resources")
 

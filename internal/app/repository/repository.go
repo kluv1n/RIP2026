@@ -25,18 +25,21 @@ type BatteryType struct {
 
 // Application — заявка на расчёт времени работы
 type Application struct {
-	ID          int
-	Title       string
-	Description string
-	Items       []ApplicationItem
-	ItemCount   int
+	ID                int
+	Title             string
+	Description       string
+	Items             []ApplicationItem
+	ItemCount         int
+	TotalRuntimeHours float64 // сумма времени работы по всем аккумуляторам (ч)
 }
 
-// ApplicationItem — строка заявки: аккумулятор + потребляемый ток → время работы (ч)
+// ApplicationItem — строка заявки: аккумулятор + потребляемый ток + количество → время работы (ч)
 type ApplicationItem struct {
-	Battery      BatteryType
-	CurrentMa    int     // потребляемый ток устройства, мА
-	RuntimeHours float64 // время работы, ч (ёмкость / ток)
+	Battery       BatteryType
+	CurrentMa     int     // потребляемый ток устройства, мА
+	Quantity      int     // количество аккумуляторов
+	RuntimeHours  float64 // время работы одного аккумулятора, ч (ёмкость / ток)
+	RuntimeTotal  float64 // время × количество, ч (вклад строки в общую сумму)
 }
 
 func (r *Repository) GetBatteryTypes() ([]BatteryType, error) {
@@ -113,6 +116,7 @@ func RuntimeHours(capacityMah, currentMa int) float64 {
 func (r *Repository) buildApplication(id int, title, description string, entries []struct {
 	BatteryID int
 	CurrentMa int
+	Quantity  int
 }) (Application, error) {
 	batteries, err := r.GetBatteryTypes()
 	if err != nil {
@@ -123,23 +127,34 @@ func (r *Repository) buildApplication(id int, title, description string, entries
 		batteryMap[b.ID] = b
 	}
 	var items []ApplicationItem
+	var totalRuntime float64
 	for _, e := range entries {
 		b, ok := batteryMap[e.BatteryID]
 		if !ok {
 			continue
 		}
+		qty := e.Quantity
+		if qty <= 0 {
+			qty = 1
+		}
+		rh := RuntimeHours(b.CapacityMah, e.CurrentMa)
+		rt := rh * float64(qty)
 		items = append(items, ApplicationItem{
 			Battery:      b,
 			CurrentMa:    e.CurrentMa,
-			RuntimeHours: RuntimeHours(b.CapacityMah, e.CurrentMa),
+			Quantity:     qty,
+			RuntimeHours: rh,
+			RuntimeTotal: rt,
 		})
+		totalRuntime += rt
 	}
 	return Application{
-		ID:          id,
-		Title:       title,
-		Description: description,
-		Items:       items,
-		ItemCount:   len(items),
+		ID:                id,
+		Title:             title,
+		Description:       description,
+		Items:             items,
+		ItemCount:         len(items),
+		TotalRuntimeHours: totalRuntime,
 	}, nil
 }
 
@@ -147,10 +162,11 @@ func (r *Repository) GetApplications() ([]Application, error) {
 	entries := []struct {
 		BatteryID int
 		CurrentMa int
+		Quantity  int
 	}{
-		{1, 500},
-		{2, 300},
-		{3, 200},
+		{1, 500, 1},
+		{2, 300, 2},
+		{3, 200, 3},
 	}
 	app, err := r.buildApplication(
 		1,

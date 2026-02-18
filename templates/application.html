@@ -15,10 +15,10 @@
             <div class="application-detail__info">
                 <div class="application-detail__info-item"><strong>ID заявки:</strong> {{ .app.ID }}</div>
                 <div class="application-detail__info-item"><strong>Описание:</strong> {{ .app.Description }}</div>
-                <div class="application-detail__info-item"><strong>Количество расчётов:</strong> {{ .app.ItemCount }}</div>
+                <div class="application-detail__info-item"><strong>Аккумуляторов в заявке:</strong> {{ .app.ItemCount }}</div>
             </div>
             <div class="application-detail__salary-result">
-                Результат: время работы {{ .runtimeSummary }}
+                Сумма времени работы: {{ .runtimeSummary }}
             </div>
         </div>
 
@@ -29,9 +29,10 @@
                     <th>Тип аккумулятора</th>
                     <th>Ёмкость (мА·ч)</th>
                     <th>Напряжение (В)</th>
-                    <th>Ток устройства (мА)</th>
-                    <th>Время работы (ч)</th>
-                    <th>м-м (комментарий)</th>
+                    <th>Ток (мА)</th>
+                    <th>Время (ч/шт)</th>
+                    <th>Кол-во</th>
+                    <th>Итого (ч)</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,10 +45,15 @@
                     <td>{{ .Battery.CapacityMah }}</td>
                     <td>{{ .Battery.VoltageV }}</td>
                     <td><input type="text" value="{{ .CurrentMa }}" readonly class="role-input"></td>
-                    <td class="app-table__col-salary">{{ printf "%.2f" .RuntimeHours }}</td>
-                    <td><input type="text" value="—" readonly class="role-input"></td>
+                    <td>{{ printf "%.2f" .RuntimeHours }}</td>
+                    <td>{{ .Quantity }}</td>
+                    <td class="app-table__col-salary">{{ printf "%.2f" .RuntimeTotal }}</td>
                 </tr>
                 {{ end }}
+                <tr class="app-table__total-row">
+                    <td colspan="7" class="app-table__total-label">Итого (сумма):</td>
+                    <td class="app-table__col-salary app-table__total-value">{{ printf "%.2f" .app.TotalRuntimeHours }} ч</td>
+                </tr>
             </tbody>
         </table>
     </div>

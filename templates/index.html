@@ -20,15 +20,15 @@
                 Заявка: <span class="application-card__link">№ {{ .ID }}</span>
             </div>
             <div class="application-card__info">
-                <span>Расчётов в заявке: <strong>{{ .ItemCount }}</strong></span>
-                <span>Результат: <span class="application-card__badge">время работы (ч) по строкам</span></span>
+                <span>Аккумуляторов: <strong>{{ .ItemCount }}</strong></span>
+                <span>Сумма времени работы: <span class="application-card__badge">{{ printf "%.2f" .TotalRuntimeHours }} ч</span></span>
             </div>
         </a>
         {{ end }}
+        <h2 class="section-title">Типы аккумуляторов</h2>
         <div class="container">
             {{ range .batteries }}
             <a href="/battery/{{ .ID }}" class="card">
-                <div class="card-accent-bar"></div>
                 <img src="http://localhost:9000/test/{{ .Photo }}" alt="img">
                 <h1>{{ .Title }}</h1>
                 <p class="card__employees">Ёмкость: {{ .CapacityMah }} мА·ч, {{ .VoltageV }} В</p>
