@@ -407,11 +407,81 @@ a.card .card__description {
 }
 
 .application-detail__header-card {
-    background-color: var(--alfa-white);
+    background-color: rgb(242, 243, 245);
     border: 2px solid var(--alfa-red);
-    border-radius: 8px;
+    border-radius: 20px;
     padding: 24px 32px;
     margin-bottom: 32px;
+}
+
+.application-detail__result {
+    margin-top: 16px;
+    font-size: 1rem;
+    color: var(--alfa-text-muted);
+}
+
+.application-detail__result strong {
+    color: var(--alfa-black);
+}
+
+.application-result-input {
+    margin-left: 8px;
+    min-width: 80px;
+}
+
+.application-items {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.application-item-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    background-color: rgb(242, 243, 245);
+    border: 1px solid var(--alfa-border);
+    border-radius: 20px;
+    padding: 16px 24px;
+}
+
+.application-item-card__fields {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.application-item-card__photo {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 12px;
+    background-color: var(--alfa-border);
+}
+
+.application-item-card__field {
+    font-size: 0.95rem;
+    color: var(--alfa-text-muted);
+}
+
+.application-item-card__field:first-of-type {
+    font-weight: 600;
+    color: var(--alfa-black);
+}
+
+.application-item-card__mm {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.application-item-card__mm-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--alfa-text-muted);
 }
 
 .application-detail__title {

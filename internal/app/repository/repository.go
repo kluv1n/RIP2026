@@ -33,13 +33,14 @@ type Application struct {
 	TotalRuntimeHours float64 // сумма времени работы по всем аккумуляторам (ч)
 }
 
-// ApplicationItem — строка заявки: аккумулятор + потребляемый ток + количество → время работы (ч)
+// ApplicationItem — строка заявки: аккумулятор + потребляемый ток + м-м (количество) → время работы (ч)
 type ApplicationItem struct {
-	Battery       BatteryType
-	CurrentMa     int     // потребляемый ток устройства, мА
-	Quantity      int     // количество аккумуляторов
-	RuntimeHours  float64 // время работы одного аккумулятора, ч (ёмкость / ток)
-	RuntimeTotal  float64 // время × количество, ч (вклад строки в общую сумму)
+	Battery      BatteryType
+	CurrentMa    int     // потребляемый ток устройства, мА
+	Mm           string  // м-м: количество/порядок/комментарий (в последующих лабах меняет пользователь)
+	Quantity     int     // количество — используется для расчёта (в м-м отображаем как вариант "количества")
+	RuntimeHours float64 // время работы одного аккумулятора, ч (ёмкость / ток)
+	RuntimeTotal float64 // время × количество, ч (вклад в сумму)
 }
 
 func (r *Repository) GetBatteryTypes() ([]BatteryType, error) {
@@ -142,6 +143,7 @@ func (r *Repository) buildApplication(id int, title, description string, entries
 		items = append(items, ApplicationItem{
 			Battery:      b,
 			CurrentMa:    e.CurrentMa,
+			Mm:           fmt.Sprintf("%d", qty), // м-м: количество (в лабе 2+ будет редактироваться)
 			Quantity:     qty,
 			RuntimeHours: rh,
 			RuntimeTotal: rt,
@@ -170,7 +172,7 @@ func (r *Repository) GetApplications() ([]Application, error) {
 	}
 	app, err := r.buildApplication(
 		1,
-		"Расчёт времени работы устройства от батареи",
+		"Расчёт времени работы в часах для устройства с указанным потребляемым током и выбранным типом аккумулятора",
 		"Расчёт времени работы в часах для устройства с указанным потребляемым током и выбранным типом аккумулятора. Время (ч) = ёмкость (мА·ч) / ток (мА).",
 		entries,
 	)

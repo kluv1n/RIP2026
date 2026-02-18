@@ -20,8 +20,8 @@
                 Заявка: <span class="application-card__link">№ {{ .ID }}</span>
             </div>
             <div class="application-card__info">
-                <span>Аккумуляторов: <strong>{{ .ItemCount }}</strong></span>
-                <span>Сумма времени работы: <span class="application-card__badge">{{ printf "%.2f" .TotalRuntimeHours }} ч</span></span>
+                <span>Услуг в заявке: <strong>{{ .ItemCount }}</strong></span>
+                <span>Результат: <span class="application-card__badge">{{ printf "%.2f" .TotalRuntimeHours }} ч</span></span>
             </div>
         </a>
         {{ end }}

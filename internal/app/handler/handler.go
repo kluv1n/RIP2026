@@ -80,6 +80,6 @@ func (h *Handler) GetApplication(ctx *gin.Context) {
 
 	ctx.HTML(http.StatusOK, "application.html", gin.H{
 		"app":            app,
-		"runtimeSummary": fmt.Sprintf("%.2f ч (сумма по всем аккумуляторам)", app.TotalRuntimeHours),
+		"runtimeSummary": fmt.Sprintf("%.2f ч", app.TotalRuntimeHours),
 	})
 }
