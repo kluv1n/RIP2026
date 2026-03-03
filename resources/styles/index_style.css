@@ -1,40 +1,42 @@
-/* Палитра alfabank.ru: красный #EF3124, чёрный #000000, белый #FFFFFF */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap');
+/* Палитра и стили по neter.pro/akkumulyatornye-batarei */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
 
 :root {
-    --alfa-red: #EF3124;
-    --alfa-red-hover: #d42b1f;
-    --alfa-red-active: #b92419;
-    --alfa-black: #000000;
-    --alfa-white: #FFFFFF;
-    --alfa-header: #121213;
-    --alfa-bg: #f5f5f5;
-    --alfa-border: #e0e0e0;
-    --alfa-text: #000000;
-    --alfa-text-muted: #555555;
-    --alfa-text-light: #666666;
+    --neter-header: #0a3141;
+    --neter-text: #0A3141;
+    --neter-hover: #2CB4C2;
+    --neter-card-bg: #F6F8FA;
+    --neter-search-bg: #F6F8FA;
+    --neter-white: #FFFFFF;
+    --neter-bg: #ffffff;
+    --neter-border: #d2dde4;
+    --neter-text-muted: #5d6c7a;
+    --neter-text-light: #738394;
+    --icon-default: #006baa;
+    --icon-cart-hover: #007cba;
+    --icon-search-hover: #005a87;
 }
 
 * {
     margin: 0;
     padding: 0;
-    font-family: 'Roboto', sans-serif;
-    color: var(--alfa-text);
+    font-family: 'Onest', 'Manrope', sans-serif;
+    color: var(--neter-text);
 }
 
 body {
-    background: var(--alfa-bg);
+    background: var(--neter-bg);
     overflow-x: hidden;
 }
 
 a {
-    color: var(--alfa-red);
+    color: var(--neter-text);
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
 a:hover {
-    color: var(--alfa-red-hover);
+    color: var(--neter-hover);
 }
 
 img {
@@ -46,13 +48,11 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-wrap: wrap;
-    gap: 32px 48px;
-    background-color: var(--alfa-header);
+    background-color: var(--neter-header);
     min-height: 96px;
     width: 100%;
-    border-bottom: 2px solid var(--alfa-red);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 0 48px;
     box-sizing: border-box;
 }
@@ -65,184 +65,249 @@ header {
 }
 
 .header-logo:hover {
-    opacity: 0.85;
+    opacity: 0.9;
 }
 
 .header-logo img,
 .header-logo__img {
-    height: 64px;
+    height: 56px;
     width: auto;
     display: block;
     object-fit: contain;
     vertical-align: middle;
 }
 
-header form {
+/* Toolbar: поиск по центру, корзина вправо по краю */
+.toolbar {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px 24px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    gap: 16px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.toolbar__search-form {
     flex-shrink: 0;
 }
 
-header .search-input {
-    background-color: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.3);
-    color: var(--alfa-white);
-}
-
-header .search-input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.search-input {
-    width: 520px;
-    max-width: 50vw;
-    height: 46px;
-    border-radius: 8px;
-    border: 1px solid var(--alfa-border);
-    font-size: 16px;
-    padding-left: 12px;
+.search-bar {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--neter-search-bg);
+    border-radius: 12px;
+    padding: 0 4px 0 16px;
+    height: 48px;
     box-sizing: border-box;
-    color: var(--alfa-black);
+    min-width: 320px;
+    max-width: 420px;
 }
 
-.search-input:focus {
-    border-color: var(--alfa-red);
+.search-bar .search-input {
+    flex: 1;
+    height: 44px;
+    border: none;
+    background: transparent;
+    color: var(--neter-text);
+    font-size: 16px;
+    padding: 0 12px 0 0;
+    min-width: 0;
+}
+
+.search-bar .search-input::placeholder {
+    color: var(--neter-text-muted);
+}
+
+.search-bar .search-input:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(239, 49, 36, 0.15);
+    box-shadow: none;
 }
 
 .search-btn {
-    background-color: var(--alfa-red);
-    border-radius: 8px;
+    width: 40px;
+    height: 40px;
     border: none;
-    color: var(--alfa-white);
+    border-radius: 10px;
+    background-color: var(--icon-default);
+    color: #ffffff;
     cursor: pointer;
-    padding: 10px 24px;
-    font-size: 15px;
-    font-weight: 600;
-    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .search-btn:hover {
-    background-color: var(--alfa-red-hover);
+    background-color: var(--icon-search-hover);
+    color: #ffffff;
+}
+
+.search-btn__icon {
+    width: 20px;
+    height: 20px;
+    color: inherit;
 }
 
 .search-btn:active {
-    background-color: var(--alfa-red-active);
+    background-color: #004a6e;
+    color: #ffffff;
+}
+
+.cart-wrap {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .back-link {
     display: inline-block;
     margin-bottom: 20px;
     font-size: 0.95rem;
-    color: var(--alfa-red);
+    color: var(--neter-text);
     font-weight: 500;
 }
 
 .back-link:hover {
-    color: var(--alfa-red-hover);
+    color: var(--neter-hover);
 }
 
 .header-center {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--alfa-header);
+    background-color: var(--neter-header);
     min-height: 96px;
     width: 100%;
-    border-bottom: 2px solid var(--alfa-red);
-    box-shadow: 0 4px 12px rgba(239, 49, 36, 0.08);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 0 48px;
     box-sizing: border-box;
 }
 
 .header-center .header-logo img,
 .header-center .header-logo__img {
-    height: 64px;
+    height: 56px;
+}
+
+.cart-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: none;
+    background-color: var(--icon-default);
+    color: #ffffff !important;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.cart-button__icon {
+    width: 28px;
+    height: 28px;
+    color: inherit;
+}
+
+.cart-button:hover {
+    background-color: var(--icon-cart-hover);
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 124, 186, 0.25);
+}
+
+.cart-button__label {
+    color: inherit !important;
 }
 
 .space {
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
-    padding: 40px 24px 80px;
+    padding: 24px 24px 80px;
 }
 
-a.application-card {
+/* Карточки battery life — как a.item: без обводки, фон F6F8FA, при наведении текст 2CB4C2 */
+a.battery-life-card {
     display: block;
-    background-color: rgb(242, 243, 245);
-    border: 2px solid var(--alfa-red);
-    border-radius: 20px;
-    padding: 24px 32px;
-    margin-bottom: 36px;
-    transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.25s ease;
+    background-color: var(--neter-card-bg);
+    border: none;
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    transition: color 0.2s ease, background-color 0.15s ease;
     text-decoration: none;
     cursor: pointer;
+    color: var(--neter-text);
+    font-size: 16px;
 }
 
-a.application-card:hover {
-    box-shadow: 0 4px 16px rgba(239, 49, 36, 0.15);
-    border-color: var(--alfa-red-hover);
-    transform: scale(1.02);
+a.battery-life-card:hover,
+a.battery-life-card:hover .battery-life-card__title,
+a.battery-life-card:hover .battery-life-card__id,
+a.battery-life-card:hover .battery-life-card__info {
+    color: var(--neter-hover);
 }
 
-.application-card__title {
-    font-size: 1.15rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: var(--alfa-black);
-}
-
-.application-card__id {
+.battery-life-card__title {
     font-size: 1rem;
-    margin-bottom: 10px;
-    color: var(--alfa-black);
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--neter-text);
 }
 
-.application-card__link {
+.battery-life-card__id {
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+    color: var(--neter-text);
+}
+
+.battery-life-card__link {
     font-weight: 600;
-    color: var(--alfa-red);
+    color: inherit;
 }
 
-.application-card__info {
+.battery-life-card__info {
     display: flex;
     flex-wrap: wrap;
     gap: 16px 32px;
-    font-size: 0.95rem;
-    color: var(--alfa-text-muted);
+    font-size: 0.9rem;
+    color: var(--neter-text-muted);
 }
 
-.application-card__info span {
+a.battery-life-card:hover .battery-life-card__info {
+    color: var(--neter-hover);
+}
+
+.battery-life-card__info span {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    color: var(--alfa-text-muted);
 }
 
-.application-card__badge {
-    background-color: var(--alfa-red);
-    color: var(--alfa-white);
+.battery-life-card__badge {
+    background-color: var(--neter-hover);
+    color: var(--neter-white);
     font-weight: 600;
-    padding: 2px 10px;
+    padding: 2px 8px;
     border-radius: 4px;
-    font-size: 0.9rem;
-}
-
-.card-accent-bar {
-    width: 100%;
-    height: 4px;
-    background-color: var(--alfa-red);
-    flex-shrink: 0;
+    font-size: 0.85rem;
 }
 
 .section-title {
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--alfa-black);
+    color: var(--neter-text);
     margin-bottom: 20px;
     padding-bottom: 8px;
-    border-bottom: 3px solid var(--alfa-red);
+    border-bottom: 2px solid var(--neter-hover);
     display: inline-block;
 }
 
@@ -253,58 +318,73 @@ a.application-card:hover {
     align-items: stretch;
 }
 
+/* Карточки типов аккумуляторов: две крайние F6F8FA, центральная белая, без обводки, hover — текст 2CB4C2 */
 a.card {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
     min-height: 300px;
-    font-size: 14px;
-    border-radius: 20px;
-    background-color: rgb(242, 243, 245);
+    font-size: 16px;
+    border-radius: 12px;
     gap: 4px;
-    border: 1px solid var(--alfa-border);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.25s ease;
+    border: none;
+    transition: color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
     overflow: hidden;
     text-decoration: none;
     cursor: pointer;
+    color: var(--neter-text);
+}
+
+a.card:nth-child(3n+1),
+a.card:nth-child(3n+3) {
+    background-color: var(--neter-card-bg);
+}
+
+a.card:nth-child(3n+2) {
+    background-color: var(--neter-white);
 }
 
 a.card:hover {
-    border-color: var(--alfa-red);
-    box-shadow: 0 8px 24px rgba(239, 49, 36, 0.15);
-    transform: scale(1.05);
-    color: inherit;
+    color: var(--neter-hover);
+    box-shadow: 0 8px 24px rgba(10, 49, 65, 0.12);
+    transform: translateY(-2px);
+}
+
+a.card:hover h1,
+a.card:hover .card__employees,
+a.card:hover .card__description {
+    color: var(--neter-hover);
 }
 
 a.card img {
     width: 100%;
     height: 180px;
     object-fit: cover;
-    background-color: var(--alfa-border);
+    background-color: var(--neter-border);
 }
 
 a.card h1 {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     align-self: flex-start;
     margin: 8px 20px 0;
-    color: var(--alfa-black);
+    color: var(--neter-text);
 }
 
 a.card .card__employees {
     font-size: 14px;
     align-self: flex-start;
     margin-left: 20px;
-    color: var(--alfa-red);
+    color: var(--neter-text);
     font-weight: 600;
 }
 
 a.card .card__description {
-    font-size: 12px;
+    font-size: 13px;
     align-self: flex-start;
     margin: 4px 20px 12px;
-    color: var(--alfa-text-light);
+    color: var(--neter-text-light);
     font-weight: 400;
     line-height: 1.4;
     display: -webkit-box;
@@ -320,9 +400,9 @@ a.card .card__description {
 }
 
 .detail-card {
-    background-color: rgb(242, 243, 245);
-    border-radius: 8px;
-    border: 1px solid var(--alfa-border);
+    background-color: var(--neter-card-bg);
+    border-radius: 12px;
+    border: none;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
@@ -330,7 +410,7 @@ a.card .card__description {
 .detail-card__video {
     width: 100%;
     max-height: 420px;
-    background-color: var(--alfa-black);
+    background-color: var(--neter-text);
     display: block;
 }
 
@@ -341,20 +421,20 @@ a.card .card__description {
 .detail-card__title {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--alfa-black);
+    color: var(--neter-text);
     margin-bottom: 10px;
 }
 
 .detail-card__employees {
     font-size: 1rem;
-    color: var(--alfa-red);
+    color: var(--neter-text);
     font-weight: 600;
     margin-bottom: 6px;
 }
 
 .detail-card__description {
     font-size: 0.93rem;
-    color: var(--alfa-text-light);
+    color: var(--neter-text-light);
     line-height: 1.6;
     margin-top: 16px;
     margin-bottom: 0;
@@ -362,20 +442,20 @@ a.card .card__description {
 
 .detail-card__separator {
     border: none;
-    border-top: 1px solid var(--alfa-border);
+    border-top: 1px solid var(--neter-border);
     margin: 20px 0;
 }
 
 .detail-card__section-title {
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--alfa-black);
+    color: var(--neter-text);
     margin-bottom: 12px;
 }
 
 .manager-block {
-    background-color: var(--alfa-bg);
-    border: 1px solid var(--alfa-border);
+    background-color: var(--neter-bg);
+    border: none;
     border-radius: 8px;
     padding: 16px 20px;
     margin-bottom: 12px;
@@ -384,7 +464,7 @@ a.card .card__description {
 .manager-block__name {
     font-size: 1.05rem;
     font-weight: 700;
-    color: var(--alfa-black);
+    color: var(--neter-text);
     margin-bottom: 4px;
 }
 
@@ -393,38 +473,38 @@ a.card .card__description {
     flex-wrap: wrap;
     gap: 16px 28px;
     font-size: 0.9rem;
-    color: var(--alfa-text-muted);
+    color: var(--neter-text-muted);
 }
 
 .manager-block__meta strong {
-    color: var(--alfa-black);
+    color: var(--neter-text);
 }
 
-.application-detail {
+.battery-life-detail {
     max-width: 1200px;
     margin: 30px auto;
     padding: 0 20px;
 }
 
-.application-detail__header-card {
-    background-color: rgb(242, 243, 245);
-    border: 2px solid var(--alfa-red);
-    border-radius: 20px;
+.battery-life-detail__header-card {
+    background-color: var(--neter-card-bg);
+    border: none;
+    border-radius: 12px;
     padding: 24px 32px;
     margin-bottom: 32px;
 }
 
-.application-detail__result {
+.battery-life-detail__result {
     margin-top: 16px;
     font-size: 1rem;
-    color: var(--alfa-text-muted);
+    color: var(--neter-text-muted);
 }
 
-.application-detail__result strong {
-    color: var(--alfa-black);
+.battery-life-detail__result strong {
+    color: var(--neter-text);
 }
 
-.application-result-input {
+.battery-life-detail__result-value {
     margin-left: 8px;
     min-width: 80px;
 }
@@ -440,9 +520,9 @@ a.card .card__description {
     align-items: center;
     justify-content: space-between;
     gap: 24px;
-    background-color: rgb(242, 243, 245);
-    border: 1px solid var(--alfa-border);
-    border-radius: 20px;
+    background-color: var(--neter-card-bg);
+    border: none;
+    border-radius: 12px;
     padding: 16px 24px;
 }
 
@@ -458,17 +538,17 @@ a.card .card__description {
     height: 60px;
     object-fit: cover;
     border-radius: 12px;
-    background-color: var(--alfa-border);
+    background-color: var(--neter-border);
 }
 
 .application-item-card__field {
     font-size: 0.95rem;
-    color: var(--alfa-text-muted);
+    color: var(--neter-text-muted);
 }
 
 .application-item-card__field:first-of-type {
     font-weight: 600;
-    color: var(--alfa-black);
+    color: var(--neter-text);
 }
 
 .application-item-card__mm {
@@ -481,138 +561,155 @@ a.card .card__description {
 .application-item-card__mm-label {
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--alfa-text-muted);
+    color: var(--neter-text-muted);
 }
 
-.application-detail__title {
+.battery-life-detail__title {
     font-size: 1.4rem;
     font-weight: 700;
-    color: var(--alfa-black);
+    color: var(--neter-text);
     margin-bottom: 16px;
 }
 
-.application-detail__info {
+.battery-life-detail__info {
     display: flex;
     flex-direction: column;
     gap: 8px;
     font-size: 0.95rem;
-    color: var(--alfa-text-muted);
+    color: var(--neter-text-muted);
 }
 
-.application-detail__info-item strong {
-    color: var(--alfa-black);
+.battery-life-detail__info-item strong {
+    color: var(--neter-text);
 }
 
-.application-detail__salary-result {
+.battery-life-detail__salary-result {
     margin-top: 16px;
     padding: 12px 18px;
-    background-color: var(--alfa-red);
-    color: var(--alfa-white);
+    background-color: var(--neter-hover);
+    color: var(--neter-white);
     border-radius: 8px;
     font-size: 1rem;
     font-weight: 700;
     display: inline-block;
 }
 
-.app-table {
+.battery-life-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0 10px;
 }
 
-.app-table thead tr {
-    background-color: var(--alfa-white);
-    border: 1px solid var(--alfa-border);
+.battery-life-table thead tr {
+    background-color: var(--neter-white);
+    border: 1px solid var(--neter-border);
 }
 
-.app-table thead th {
+.battery-life-table thead th {
     text-align: left;
     font-weight: 600;
     font-size: 13px;
-    color: var(--alfa-text-muted);
+    color: var(--neter-text-muted);
     padding: 10px 12px;
-    border-top: 1px solid var(--alfa-border);
-    border-bottom: 1px solid var(--alfa-border);
+    border-top: 1px solid var(--neter-border);
+    border-bottom: 1px solid var(--neter-border);
     white-space: nowrap;
 }
 
-.app-table thead th:first-child {
-    border-left: 1px solid var(--alfa-border);
+.battery-life-table thead th:first-child {
+    border-left: 1px solid var(--neter-border);
     border-radius: 8px 0 0 8px;
 }
 
-.app-table thead th:last-child {
-    border-right: 1px solid var(--alfa-border);
+.battery-life-table thead th:last-child {
+    border-right: 1px solid var(--neter-border);
     border-radius: 0 8px 8px 0;
 }
 
-.app-table tbody tr {
-    background-color: var(--alfa-white);
+.battery-life-table tbody tr {
+    background-color: var(--neter-white);
 }
 
-.app-table tbody td {
+.battery-life-table tbody td {
     padding: 12px;
     font-size: 15px;
-    color: var(--alfa-text-muted);
-    border: 1px solid var(--alfa-border);
+    color: var(--neter-text-muted);
+    border: 1px solid var(--neter-border);
     vertical-align: middle;
 }
 
-.app-table tbody tr td:first-child {
+.battery-life-table tbody tr td:first-child {
     border-radius: 8px 0 0 8px;
 }
 
-.app-table tbody tr td:last-child {
+.battery-life-table tbody tr td:last-child {
     border-radius: 0 8px 8px 0;
 }
 
-.app-table__col-photo {
+.battery-life-table__col-photo {
     width: 80px;
 }
 
-.app-table__col-photo img {
+.battery-life-table__col-photo img {
     width: 80px;
     height: 80px;
     border-radius: 6px;
     object-fit: cover;
-    background-color: var(--alfa-border);
+    background-color: var(--neter-border);
 }
 
-.app-table__col-salary {
-    color: var(--alfa-red) !important;
+.battery-life-table__col-result {
+    color: var(--neter-hover) !important;
     font-weight: 600;
 }
 
-.app-table__total-row td {
+.battery-life-table__total-row td {
     font-weight: 700;
-    background-color: var(--alfa-bg) !important;
-    border-color: var(--alfa-red) !important;
+    background-color: var(--neter-card-bg) !important;
+    border-color: var(--neter-hover) !important;
 }
 
-.app-table__total-label {
-    color: var(--alfa-black) !important;
+.battery-life-table__total-label {
+    color: var(--neter-text) !important;
     text-align: right;
 }
 
-.app-table__total-value {
+.battery-life-table__total-value {
     font-size: 1.05rem !important;
 }
 
 .role-input {
     width: 100%;
     height: 28px;
-    border: 1px solid var(--alfa-border);
+    border: 1px solid var(--neter-border);
     font-size: 14px;
     border-radius: 8px;
     text-align: center;
     box-sizing: border-box;
-    background: var(--alfa-white);
-    color: var(--alfa-black);
+    background: var(--neter-white);
+    color: var(--neter-text);
 }
 
 @media (max-width: 992px) {
     .container {
         grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .toolbar {
+        flex-wrap: wrap;
+        justify-content: center;
+        padding-bottom: 56px;
+    }
+    .search-bar {
+        min-width: 0;
+        max-width: none;
+        flex: 1;
+    }
+    .cart-wrap {
+        position: static;
+        transform: none;
     }
 }
 
@@ -633,6 +730,6 @@ a.card .card__description {
     .header-logo img,
     .header-logo__img,
     .header-center .header-logo__img {
-        height: 48px;
+        height: 44px;
     }
 }

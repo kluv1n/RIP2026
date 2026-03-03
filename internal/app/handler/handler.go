@@ -32,7 +32,7 @@ func (h *Handler) GetBatteryTypes(ctx *gin.Context) {
 		logrus.Error(err)
 	}
 
-	applications, err := h.Repository.GetApplications()
+	batteryLives, err := h.Repository.GetBatteryLives()
 	if err != nil {
 		logrus.Error(err)
 	}
@@ -40,7 +40,7 @@ func (h *Handler) GetBatteryTypes(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "index.html", gin.H{
 		"batteries":    batteries,
 		"query":        searchQuery,
-		"applications": applications,
+		"batteryLives": batteryLives,
 	})
 }
 
@@ -56,30 +56,30 @@ func (h *Handler) GetBattery(ctx *gin.Context) {
 		logrus.Error(err)
 	}
 
-	appItem, err := h.Repository.GetApplicationForBattery(id)
-	hasInApplication := err == nil && appItem != nil
+	batteryLifeItem, err := h.Repository.GetBatteryLifeForBattery(id)
+	hasInBatteryLife := err == nil && batteryLifeItem != nil
 
 	ctx.HTML(http.StatusOK, "battery.html", gin.H{
 		"battery":          battery,
-		"appItem":          appItem,
-		"hasInApplication": hasInApplication,
+		"batteryLifeItem":  batteryLifeItem,
+		"hasInBatteryLife": hasInBatteryLife,
 	})
 }
 
-func (h *Handler) GetApplication(ctx *gin.Context) {
+func (h *Handler) GetBatteryLife(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		logrus.Error(err)
 	}
 
-	app, err := h.Repository.GetApplication(id)
+	life, err := h.Repository.GetBatteryLife(id)
 	if err != nil {
 		logrus.Error(err)
 	}
 
-	ctx.HTML(http.StatusOK, "application.html", gin.H{
-		"app":            app,
-		"runtimeSummary": fmt.Sprintf("%.2f ч", app.TotalRuntimeHours),
+	ctx.HTML(http.StatusOK, "battery_life.html", gin.H{
+		"batteryLife":    life,
+		"runtimeSummary": fmt.Sprintf("%.2f ч", life.TotalRuntimeHours),
 	})
 }

@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	log.Println("Application start!")
+	log.Println("Battery life service start!")
 	api.StartServer()
-	log.Println("Application terminated!")
+	log.Println("Battery life service terminated!")
 }

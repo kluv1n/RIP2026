@@ -11,7 +11,7 @@ func NewRepository() (*Repository, error) {
 	return &Repository{}, nil
 }
 
-// BatteryType — тип аккумулятора (услуга)
+// BatteryType — тип аккумулятора (услуга: ёмкость и напряжение)
 type BatteryType struct {
 	ID               int
 	Title            string
@@ -23,22 +23,22 @@ type BatteryType struct {
 	Description      string
 }
 
-// Application — заявка на расчёт времени работы
-type Application struct {
+// BatteryLife — расчёт времени работы (battery life)
+type BatteryLife struct {
 	ID                int
 	Title             string
 	Description       string
-	Items             []ApplicationItem
+	Items             []BatteryLifeItem
 	ItemCount         int
-	TotalRuntimeHours float64 // сумма времени работы по всем аккумуляторам (ч)
+	TotalRuntimeHours float64 // итоговое время работы по всем аккумуляторам (ч)
 }
 
-// ApplicationItem — строка заявки: аккумулятор + потребляемый ток + м-м (количество) → время работы (ч)
-type ApplicationItem struct {
+// BatteryLifeItem — строка расчёта: аккумулятор + потребляемый ток (заявка) + м-м (количество) → время работы (ч)
+type BatteryLifeItem struct {
 	Battery      BatteryType
-	CurrentMa    int     // потребляемый ток устройства, мА
-	Mm           string  // м-м: количество/порядок/комментарий (в последующих лабах меняет пользователь)
-	Quantity     int     // количество — используется для расчёта (в м-м отображаем как вариант "количества")
+	CurrentMa    int     // потребляемый ток устройства, мА (поле "Заявка")
+	Mm           string  // м-м: количество (для отображения)
+	Quantity     int     // количество — используется для расчёта
 	RuntimeHours float64 // время работы одного аккумулятора, ч (ёмкость / ток)
 	RuntimeTotal float64 // время × количество, ч (вклад в сумму)
 }
@@ -114,20 +114,20 @@ func RuntimeHours(capacityMah, currentMa int) float64 {
 	return float64(capacityMah) / float64(currentMa)
 }
 
-func (r *Repository) buildApplication(id int, title, description string, entries []struct {
+func (r *Repository) buildBatteryLife(id int, title, description string, entries []struct {
 	BatteryID int
 	CurrentMa int
 	Quantity  int
-}) (Application, error) {
+}) (BatteryLife, error) {
 	batteries, err := r.GetBatteryTypes()
 	if err != nil {
-		return Application{}, err
+		return BatteryLife{}, err
 	}
 	batteryMap := make(map[int]BatteryType)
 	for _, b := range batteries {
 		batteryMap[b.ID] = b
 	}
-	var items []ApplicationItem
+	var items []BatteryLifeItem
 	var totalRuntime float64
 	for _, e := range entries {
 		b, ok := batteryMap[e.BatteryID]
@@ -140,7 +140,7 @@ func (r *Repository) buildApplication(id int, title, description string, entries
 		}
 		rh := RuntimeHours(b.CapacityMah, e.CurrentMa)
 		rt := rh * float64(qty)
-		items = append(items, ApplicationItem{
+		items = append(items, BatteryLifeItem{
 			Battery:      b,
 			CurrentMa:    e.CurrentMa,
 			Mm:           fmt.Sprintf("%d", qty), // м-м: количество (в лабе 2+ будет редактироваться)
@@ -150,7 +150,7 @@ func (r *Repository) buildApplication(id int, title, description string, entries
 		})
 		totalRuntime += rt
 	}
-	return Application{
+	return BatteryLife{
 		ID:                id,
 		Title:             title,
 		Description:       description,
@@ -160,7 +160,7 @@ func (r *Repository) buildApplication(id int, title, description string, entries
 	}, nil
 }
 
-func (r *Repository) GetApplications() ([]Application, error) {
+func (r *Repository) GetBatteryLives() ([]BatteryLife, error) {
 	entries := []struct {
 		BatteryID int
 		CurrentMa int
@@ -170,7 +170,7 @@ func (r *Repository) GetApplications() ([]Application, error) {
 		{2, 300, 2},
 		{3, 200, 3},
 	}
-	app, err := r.buildApplication(
+	app, err := r.buildBatteryLife(
 		1,
 		"Расчёт времени работы в часах для устройства с указанным потребляемым током и выбранным типом аккумулятора",
 		"Расчёт времени работы в часах для устройства с указанным потребляемым током и выбранным типом аккумулятора. Время (ч) = ёмкость (мА·ч) / ток (мА).",
@@ -179,33 +179,33 @@ func (r *Repository) GetApplications() ([]Application, error) {
 	if err != nil {
 		return nil, err
 	}
-	return []Application{app}, nil
+	return []BatteryLife{app}, nil
 }
 
-func (r *Repository) GetApplication(id int) (Application, error) {
-	apps, err := r.GetApplications()
+func (r *Repository) GetBatteryLife(id int) (BatteryLife, error) {
+	lives, err := r.GetBatteryLives()
 	if err != nil {
-		return Application{}, err
+		return BatteryLife{}, err
 	}
-	for _, app := range apps {
-		if app.ID == id {
-			return app, nil
+	for _, life := range lives {
+		if life.ID == id {
+			return life, nil
 		}
 	}
-	return Application{}, fmt.Errorf("заявка не найдена")
+	return BatteryLife{}, fmt.Errorf("battery life не найдена")
 }
 
-func (r *Repository) GetApplicationForBattery(batteryID int) (*ApplicationItem, error) {
-	apps, err := r.GetApplications()
+func (r *Repository) GetBatteryLifeForBattery(batteryID int) (*BatteryLifeItem, error) {
+	lives, err := r.GetBatteryLives()
 	if err != nil {
 		return nil, err
 	}
-	for _, app := range apps {
-		for i := range app.Items {
-			if app.Items[i].Battery.ID == batteryID {
-				return &app.Items[i], nil
+	for _, life := range lives {
+		for i := range life.Items {
+			if life.Items[i].Battery.ID == batteryID {
+				return &life.Items[i], nil
 			}
 		}
 	}
-	return nil, fmt.Errorf("аккумулятор не найден в заявке")
+	return nil, fmt.Errorf("аккумулятор не найден в battery life")
 }

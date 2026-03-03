@@ -1,6 +1,6 @@
 <html lang="ru">
     <head>
-        <title>{{ .battery.Title }} — Подробная информация</title>
+        <title>{{ .battery.Title }} — Battery life подробности</title>
         <link rel="stylesheet" href="/static/styles/index_style.css?v=alfa">
     </head>
     <header class="header-center">
@@ -16,16 +16,16 @@
             </video>
             <div class="detail-card__body">
                 <h1 class="detail-card__title">{{ .battery.Title }}</h1>
-                <p class="detail-card__employees">Ёмкость: {{ .battery.CapacityMah }} мА·ч, напряжение: {{ .battery.VoltageV }} В</p>
+                <p class="detail-card__employees">Услуга: ёмкость {{ .battery.CapacityMah }} мА·ч, напряжение {{ .battery.VoltageV }} В</p>
                 <p class="detail-card__description">{{ .battery.Description }}</p>
-                {{ if .hasInApplication }}
+                {{ if .hasInBatteryLife }}
                 <hr class="detail-card__separator">
-                <h2 class="detail-card__section-title">Расчёт в заявке</h2>
+                <h2 class="detail-card__section-title">Battery life для этого аккумулятора</h2>
                 <div class="manager-block">
-                    <div class="manager-block__name">Потребляемый ток: {{ .appItem.CurrentMa }} мА</div>
+                    <div class="manager-block__name">Потребляемый ток (заявка): {{ .batteryLifeItem.CurrentMa }} мА</div>
                     <div class="manager-block__meta">
-                        <span><strong>Время работы:</strong> {{ printf "%.2f" .appItem.RuntimeHours }} ч</span>
-                        <span><strong>Формула:</strong> {{ .battery.CapacityMah }} мА·ч / {{ .appItem.CurrentMa }} мА</span>
+                        <span><strong>Время работы:</strong> {{ printf "%.2f" .batteryLifeItem.RuntimeHours }} ч</span>
+                        <span><strong>Количество (м-м):</strong> {{ .batteryLifeItem.Mm }}</span>
                     </div>
                 </div>
                 {{ end }}

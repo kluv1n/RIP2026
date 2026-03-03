@@ -25,7 +25,7 @@ func StartServer() {
 
 	r.GET("/", h.GetBatteryTypes)
 	r.GET("/battery/:id", h.GetBattery)
-	r.GET("/application/:id", h.GetApplication)
+	r.GET("/battery-life/:id", h.GetBatteryLife)
 
 	r.Run()
 	log.Println("Server down")
