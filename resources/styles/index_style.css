@@ -314,7 +314,7 @@ a.battery-life-card:hover .battery-life-card__info {
 .container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
+    gap: 32px;
     align-items: stretch;
 }
 
@@ -324,10 +324,10 @@ a.card {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    min-height: 300px;
-    font-size: 16px;
-    border-radius: 12px;
-    gap: 4px;
+    min-height: 460px;
+    font-size: 18px;
+    border-radius: 16px;
+    gap: 8px;
     border: none;
     transition: color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
     overflow: hidden;
@@ -359,34 +359,34 @@ a.card:hover .card__description {
 
 a.card img {
     width: 100%;
-    height: 180px;
+    height: 300px;
     object-fit: cover;
     background-color: var(--neter-border);
 }
 
 a.card h1 {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 600;
     align-self: flex-start;
-    margin: 8px 20px 0;
+    margin: 16px 28px 0;
     color: var(--neter-text);
 }
 
 a.card .card__employees {
-    font-size: 14px;
+    font-size: 16px;
     align-self: flex-start;
-    margin-left: 20px;
+    margin-left: 28px;
     color: var(--neter-text);
     font-weight: 600;
 }
 
 a.card .card__description {
-    font-size: 13px;
+    font-size: 15px;
     align-self: flex-start;
-    margin: 4px 20px 12px;
+    margin: 8px 28px 20px;
     color: var(--neter-text-light);
     font-weight: 400;
-    line-height: 1.4;
+    line-height: 1.5;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
