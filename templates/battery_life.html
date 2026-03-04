@@ -1,0 +1,57 @@
+<html lang="ru">
+    <head>
+        <title>Battery life № {{ .batteryLife.ID }} — расчёт времени работы</title>
+        <link rel="stylesheet" href="/static/styles/index_style.css?v=neter">
+    </head>
+    <header class="header-center">
+        <a href="/" class="header-logo" aria-label="На главную">
+            <img src="/static/img/logo.svg?v=neter" alt="НЭТЕР" class="header-logo__img">
+        </a>
+    </header>
+    <div class="battery-life-detail">
+        <a href="/" class="back-link">← Вернуться к списку типов аккумуляторов</a>
+        <div class="battery-life-detail__header-card">
+            <h1 class="battery-life-detail__title">Battery life № {{ .batteryLife.ID }}</h1>
+            <div class="battery-life-detail__info">
+                <div class="battery-life-detail__info-item"><strong>Описание:</strong> {{ .batteryLife.Description }}</div>
+            </div>
+            <div class="battery-life-detail__result">
+                <strong>Суммарное время работы (battery life):</strong>
+                <span class="battery-life-detail__result-value">{{ printf "%.2f" .batteryLife.TotalRuntimeHours }} ч</span>
+            </div>
+        </div>
+
+        <table class="battery-life-table">
+            <thead>
+                <tr>
+                    <th class="battery-life-table__col-photo">Фото</th>
+                    <th>Услуга (тип, ёмкость и напряжение)</th>
+                    <th>Потребляемый ток (мА)</th>
+                    <th>м-м (количество)</th>
+                    <th>Battery life (ч)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .batteryLife.Items }}
+                <tr>
+                    <td class="battery-life-table__col-photo">
+                        <img src="http://localhost:9000/test/{{ .Battery.Photo }}" alt="img">
+                    </td>
+                    <td>
+                        <div><strong>{{ .Battery.Title }}</strong></div>
+                        <div>Ёмкость: {{ .Battery.CapacityMah }} мА·ч, напряжение: {{ .Battery.VoltageV }} В</div>
+                    </td>
+                    <td>{{ .CurrentMa }}</td>
+                    <td>{{ .Mm }}</td>
+                    <td class="battery-life-table__col-result">{{ printf "%.2f" .RuntimeTotal }}</td>
+                </tr>
+                {{ end }}
+                <tr class="battery-life-table__total-row">
+                    <td colspan="4" class="battery-life-table__total-label">Результат (суммарное battery life):</td>
+                    <td class="battery-life-table__col-result battery-life-table__total-value">{{ printf "%.2f" .batteryLife.TotalRuntimeHours }} ч</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</html>
+

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" width="200" height="48" aria-hidden="true">
+  <!-- 8 diamonds in circle, turquoise #2CB4C2 -->
+  <g fill="#2CB4C2" transform="translate(24, 24)">
+    <g transform="rotate(0) translate(0, -6)"><path d="M0-3.5 L2.5 0 0 3.5 -2.5 0 Z"/></g>
+    <g transform="rotate(45) translate(0, -6)"><path d="M0-3.5 L2.5 0 0 3.5 -2.5 0 Z"/></g>
+    <g transform="rotate(90) translate(0, -6)"><path d="M0-3.5 L2.5 0 0 3.5 -2.5 0 Z"/></g>
+    <g transform="rotate(135) translate(0, -6)"><path d="M0-3.5 L2.5 0 0 3.5 -2.5 0 Z"/></g>
+    <g transform="rotate(180) translate(0, -6)"><path d="M0-3.5 L2.5 0 0 3.5 -2.5 0 Z"/></g>
+    <g transform="rotate(225) translate(0, -6)"><path d="M0-3.5 L2.5 0 0 3.5 -2.5 0 Z"/></g>
+    <g transform="rotate(270) translate(0, -6)"><path d="M0-3.5 L2.5 0 0 3.5 -2.5 0 Z"/></g>
+    <g transform="rotate(315) translate(0, -6)"><path d="M0-3.5 L2.5 0 0 3.5 -2.5 0 Z"/></g>
+  </g>
+  <text x="56" y="32" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#FFFFFF">НЭТЕР</text>
+</svg>

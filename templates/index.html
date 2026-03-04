@@ -1,0 +1,59 @@
+<html lang="ru">
+    <head>
+        <title>Battery life — аккумуляторные батареи и расчёт времени работы</title>
+        <link rel="stylesheet" href="/static/styles/index_style.css?v=neter">
+    </head>
+    <header>
+        <a href="/" class="header-logo" aria-label="На главную">
+            <img src="/static/img/logo.svg?v=neter" alt="НЭТЕР" class="header-logo__img">
+        </a>
+    </header>
+    <div class="toolbar">
+        <form action="/" method="GET" class="toolbar__search-form">
+            <span class="search-bar">
+                <input type="text" name="query" class="search-input" placeholder="Поиск по типу аккумулятора" value="{{ .query }}">
+                <button type="submit" class="search-btn" aria-label="Найти">
+                    <svg class="search-btn__icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M16 16l4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </span>
+        </form>
+        <div class="cart-wrap">
+            <a href="/battery-life/1" class="cart-button" aria-label="Battery life">
+                <svg class="cart-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M7 4H5L4 6h2l3 9h9l3-7H13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="10" cy="19" r="1.5" fill="currentColor"/>
+                    <circle cx="17" cy="19" r="1.5" fill="currentColor"/>
+                </svg>
+                <span class="cart-button__label">Battery life</span>
+            </a>
+        </div>
+    </div>
+    <div class="space">
+        {{ range .batteryLives }}
+        <a href="/battery-life/{{ .ID }}" class="battery-life-card">
+            <div class="battery-life-card__title">{{ .Title }}</div>
+            <div class="battery-life-card__id">
+                Battery life: <span class="battery-life-card__link">№ {{ .ID }}</span>
+            </div>
+            <div class="battery-life-card__info">
+                <span>Аккумуляторов в battery life: <strong>{{ .ItemCount }}</strong></span>
+                <span>Результат: <span class="battery-life-card__badge">{{ printf "%.2f" .TotalRuntimeHours }} ч</span></span>
+            </div>
+        </a>
+        {{ end }}
+        <h2 class="section-title">Типы аккумуляторов</h2>
+        <div class="container">
+            {{ range .batteries }}
+            <a href="/battery/{{ .ID }}" class="card">
+                <img src="http://localhost:9000/test/{{ .Photo }}" alt="img">
+                <h1>{{ .Title }}</h1>
+                <p class="card__employees">Услуга: {{ .CapacityMah }} мА·ч, {{ .VoltageV }} В</p>
+                <p class="card__description">{{ .ShortDescription }}</p>
+            </a>
+            {{ end }}
+        </div>
+    </div>
+</html>

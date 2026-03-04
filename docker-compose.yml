@@ -1,0 +1,56 @@
+services:
+  minio:
+    image: minio/minio:latest
+    container_name: rip2026-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio124
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: rip2026-minio-init
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      mc alias set myminio http://minio:9000 minio minio124;
+      mc mb myminio/test --ignore-existing;
+      mc anonymous set download myminio/test;
+      echo 'Bucket test is now public';
+      "
+    restart: "no"
+
+  postgres:
+    image: postgres:17
+    container_name: rip2026-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:latest
+    container_name: rip2026-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+volumes:
+  minio-data:
+  postgres-data:
+  redis-data:
