@@ -3,11 +3,12 @@ package api
 import (
 	"fmt"
 
-	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"RIP2026/internal/app/config"
 	"RIP2026/internal/app/handler"
 	"RIP2026/internal/app/repository"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 func StartServer(cfg *config.Config, repo *repository.Repository) {
