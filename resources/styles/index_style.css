@@ -339,7 +339,7 @@ a.battery-life-card:hover .battery-life-card__info {
 }
 
 /* Карточки типов аккумуляторов: две крайние F6F8FA, центральная белая, без обводки, hover — текст 2CB4C2 */
-a.card {
+.card {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -349,42 +349,52 @@ a.card {
     border-radius: 16px;
     gap: 8px;
     border: none;
-    transition: color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
     overflow: hidden;
-    text-decoration: none;
-    cursor: pointer;
     color: var(--neter-text);
 }
 
-a.card:nth-child(3n+1),
-a.card:nth-child(3n+3) {
+.card:nth-child(3n+1),
+.card:nth-child(3n+3) {
     background-color: var(--neter-card-bg);
 }
 
-a.card:nth-child(3n+2) {
+.card:nth-child(3n+2) {
     background-color: var(--neter-white);
 }
 
-a.card:hover {
-    color: var(--neter-hover);
+.card:hover {
     box-shadow: 0 8px 24px rgba(10, 49, 65, 0.12);
     transform: translateY(-2px);
 }
 
-a.card:hover h1,
-a.card:hover .card__employees,
-a.card:hover .card__description {
+.card__link {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.2s ease;
+    cursor: pointer;
+}
+
+.card:hover .card__link,
+.card:hover .card__link h1,
+.card:hover .card__link .card__employees,
+.card:hover .card__link .card__description {
     color: var(--neter-hover);
 }
 
-a.card img {
+.card__link img {
     width: 100%;
     height: 300px;
     object-fit: cover;
     background-color: var(--neter-border);
 }
 
-a.card h1 {
+.card__link h1 {
     font-size: 20px;
     font-weight: 600;
     align-self: flex-start;
@@ -392,7 +402,7 @@ a.card h1 {
     color: var(--neter-text);
 }
 
-a.card .card__employees {
+.card__link .card__employees {
     font-size: 16px;
     align-self: flex-start;
     margin-left: 28px;
@@ -400,7 +410,7 @@ a.card .card__employees {
     font-weight: 600;
 }
 
-a.card .card__description {
+.card__link .card__description {
     font-size: 15px;
     align-self: flex-start;
     margin: 8px 28px 20px;
@@ -411,6 +421,17 @@ a.card .card__description {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+.card__add-form {
+    width: 100%;
+    padding: 0 28px 20px;
+    box-sizing: border-box;
+}
+
+.card__add-form .cart-button {
+    width: 100%;
+    justify-content: center;
 }
 
 .detail-wrapper {

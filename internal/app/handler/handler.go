@@ -113,19 +113,27 @@ func (h *Handler) AddBatteryToBatteryLife(ctx *gin.Context) {
 	creatorID := uint(defaultCreatorID)
 	batteryID, _ := strconv.Atoi(ctx.PostForm("battery_id"))
 	currentMa, _ := strconv.Atoi(ctx.PostForm("current_ma"))
-	quantity, _ := strconv.Atoi(ctx.PostForm("quantity"))
 	if currentMa <= 0 {
 		currentMa = 100
 	}
+	quantity, _ := strconv.Atoi(ctx.PostForm("quantity"))
 	if quantity <= 0 {
 		quantity = 1
 	}
 	if err := h.Repository.AddBatteryToBatteryLife(creatorID, batteryID, currentMa, quantity); err != nil {
 		logrus.Error(err)
-		ctx.Redirect(http.StatusFound, "/battery/"+strconv.Itoa(batteryID)+"?error=add")
+		if ctx.PostForm("return_to") == "battery" {
+			ctx.Redirect(http.StatusFound, "/battery/"+strconv.Itoa(batteryID)+"?error=add")
+		} else {
+			ctx.Redirect(http.StatusFound, "/?error=add")
+		}
 		return
 	}
-	ctx.Redirect(http.StatusFound, "/battery/"+strconv.Itoa(batteryID)+"?added=1")
+	if ctx.PostForm("return_to") == "battery" {
+		ctx.Redirect(http.StatusFound, "/battery/"+strconv.Itoa(batteryID)+"?added=1")
+	} else {
+		ctx.Redirect(http.StatusFound, "/?added=1")
+	}
 }
 
 func (h *Handler) DeleteBatteryLife(ctx *gin.Context) {

@@ -267,23 +267,22 @@ func (r *Repository) GetBatteryLifeForBattery(batteryID int, creatorID uint) (*B
 
 // AddBatteryToBatteryLife добавляет услугу в заявку (черновик). Создаёт черновик, если его нет. Через ORM.
 func (r *Repository) AddBatteryToBatteryLife(creatorID uint, batteryTypeID int, currentMa, quantity int) error {
+	var drafts []models.BatteryLife
+	r.db.Where("creator_id = ? AND status = ?", creatorID, models.StatusDraft).Limit(1).Find(&drafts)
 	var draft models.BatteryLife
-	err := r.db.Where("creator_id = ? AND status = ?", creatorID, models.StatusDraft).First(&draft).Error
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			draft = models.BatteryLife{
-				Status:    models.StatusDraft,
-				CreatedAt: time.Now(),
-				CreatorID: creatorID,
-				Title:     "Расчёт времени работы",
-				Description: "Время (ч) = ёмкость (мА·ч) / ток (мА).",
-			}
-			if err = r.db.Create(&draft).Error; err != nil {
-				return err
-			}
-		} else {
+	if len(drafts) == 0 {
+		draft = models.BatteryLife{
+			Status:    models.StatusDraft,
+			CreatedAt: time.Now(),
+			CreatorID: creatorID,
+			Title:     "Расчёт времени работы",
+			Description: "Время (ч) = ёмкость (мА·ч) / ток (мА).",
+		}
+		if err := r.db.Create(&draft).Error; err != nil {
 			return err
 		}
+	} else {
+		draft = drafts[0]
 	}
 
 	var bt models.BatteryType
@@ -295,10 +294,10 @@ func (r *Repository) AddBatteryToBatteryLife(creatorID uint, batteryTypeID int, 
 		quantity = 1
 	}
 
-	var existing models.BatteryLifeItem
-	err = r.db.Where("battery_life_id = ? AND battery_type_id = ?", draft.ID, batteryTypeID).First(&existing).Error
-	if err == nil {
-		// уже в заявке — обновляем ток, добавляем к количеству
+	var existingList []models.BatteryLifeItem
+	r.db.Where("battery_life_id = ? AND battery_type_id = ?", draft.ID, batteryTypeID).Limit(1).Find(&existingList)
+	if len(existingList) > 0 {
+		existing := existingList[0]
 		newQty := existing.Quantity + quantity
 		newMa := currentMa
 		newRuntime := RuntimeHours(bt.CapacityMah, newMa)
@@ -307,9 +306,6 @@ func (r *Repository) AddBatteryToBatteryLife(creatorID uint, batteryTypeID int, 
 			"quantity":      newQty,
 			"runtime_hours": newRuntime,
 		}).Error
-	}
-	if err != gorm.ErrRecordNotFound {
-		return err
 	}
 
 	item := models.BatteryLifeItem{

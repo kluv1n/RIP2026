@@ -46,12 +46,19 @@
         <h2 class="section-title">Типы аккумуляторов</h2>
         <div class="container">
             {{ range .batteries }}
-            <a href="/battery/{{ .ID }}" class="card">
-                <img src="http://localhost:9000/test/{{ .Photo }}" alt="img">
-                <h1>{{ .Title }}</h1>
-                <p class="card__employees">Ёмкость и напряжение: {{ .CapacityMah }} мА·ч, {{ .VoltageV }} В</p>
-                <p class="card__description">{{ .ShortDescription }}</p>
-            </a>
+            <div class="card">
+                <a href="/battery/{{ .ID }}" class="card__link">
+                    <img src="http://localhost:9000/test/{{ .Photo }}" alt="img">
+                    <h1>{{ .Title }}</h1>
+                    <p class="card__employees">Ёмкость и напряжение: {{ .CapacityMah }} мА·ч, {{ .VoltageV }} В</p>
+                    <p class="card__description">{{ .ShortDescription }}</p>
+                </a>
+                <form action="/battery-life/add" method="POST" class="card__add-form">
+                    <input type="hidden" name="battery_id" value="{{ .ID }}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="cart-button">Добавить в заявку</button>
+                </form>
+            </div>
             {{ end }}
         </div>
     </div>

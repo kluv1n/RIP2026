@@ -33,7 +33,7 @@
                 <h2 class="detail-card__section-title">Добавить в заявку (корзину)</h2>
                 <form action="/battery-life/add" method="POST" class="add-to-cart-form">
                     <input type="hidden" name="battery_id" value="{{ .batteryID }}">
-                    <label class="form-label">Потребляемый ток (мА): <input type="number" name="current_ma" value="100" min="1" class="role-input" style="width:100px;"></label>
+                    <input type="hidden" name="return_to" value="battery">
                     <label class="form-label">Количество: <input type="number" name="quantity" value="1" min="1" class="role-input" style="width:80px;"></label>
                     <button type="submit" class="cart-button">Добавить в заявку</button>
                 </form>
