@@ -19,15 +19,21 @@
                 <strong>Суммарное время работы (battery life):</strong>
                 <span class="battery-life-detail__result-value">{{ printf "%.2f" .batteryLife.TotalRuntimeHours }} ч</span>
             </div>
+            {{ if .isDraft }}
+            <form action="/battery-life/delete" method="POST" style="margin-top:16px;">
+                <input type="hidden" name="battery_life_id" value="{{ .batteryLife.ID }}">
+                <button type="submit" class="cart-button" style="background-color: var(--neter-text-muted);">Удалить заявку</button>
+            </form>
+            {{ end }}
         </div>
 
         <table class="battery-life-table">
             <thead>
                 <tr>
                     <th class="battery-life-table__col-photo">Фото</th>
-                    <th>Услуга (тип, ёмкость и напряжение)</th>
-                    <th>Потребляемый ток (мА)</th>
-                    <th>м-м (количество)</th>
+                    <th>Ёмкость и напряжение</th>
+                    <th>Потребляемый ток</th>
+                    <th>Количество</th>
                     <th>Battery life (ч)</th>
                 </tr>
             </thead>

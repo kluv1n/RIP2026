@@ -13,6 +13,9 @@ vendor/
 *.swp
 *.swo
 
+# Config with secrets
+.env
+
 # Archives (installers etc.)
 *.tar.gz
 *.zip

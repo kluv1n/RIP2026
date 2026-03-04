@@ -41,6 +41,15 @@ services:
       - postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  adminer:
+    image: adminer:latest
+    container_name: rip2026-adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
   redis:
     image: redis:latest
     container_name: rip2026-redis

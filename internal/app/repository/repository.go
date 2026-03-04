@@ -2,109 +2,56 @@ package repository
 
 import (
 	"fmt"
-	"strings"
+	"time"
+
+	"RIP2026/internal/app/models"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-type Repository struct{}
+const defaultCreatorID = 1
 
-func NewRepository() (*Repository, error) {
-	return &Repository{}, nil
+type Repository struct {
+	db *gorm.DB
 }
 
-// BatteryType — тип аккумулятора (услуга: ёмкость и напряжение)
+func New(dsn string) (*Repository, error) {
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	return &Repository{db: db}, nil
+}
+
+// DTO для шаблонов (совместимы с прежними полями)
 type BatteryType struct {
 	ID               int
 	Title            string
-	CapacityMah      int     // ёмкость, мА·ч
-	VoltageV         float64 // напряжение, В
+	CapacityMah      int
+	VoltageV         float64
 	Photo            string
 	Video            string
 	ShortDescription string
 	Description      string
 }
 
-// BatteryLife — расчёт времени работы (battery life)
+type BatteryLifeItem struct {
+	Battery      BatteryType
+	CurrentMa    int
+	Mm           string
+	Quantity     int
+	RuntimeHours float64
+	RuntimeTotal float64
+}
+
 type BatteryLife struct {
 	ID                int
 	Title             string
 	Description       string
 	Items             []BatteryLifeItem
 	ItemCount         int
-	TotalRuntimeHours float64 // итоговое время работы по всем аккумуляторам (ч)
-}
-
-// BatteryLifeItem — строка расчёта: аккумулятор + потребляемый ток (заявка) + м-м (количество) → время работы (ч)
-type BatteryLifeItem struct {
-	Battery      BatteryType
-	CurrentMa    int     // потребляемый ток устройства, мА (поле "Заявка")
-	Mm           string  // м-м: количество (для отображения)
-	Quantity     int     // количество — используется для расчёта
-	RuntimeHours float64 // время работы одного аккумулятора, ч (ёмкость / ток)
-	RuntimeTotal float64 // время × количество, ч (вклад в сумму)
-}
-
-func (r *Repository) GetBatteryTypes() ([]BatteryType, error) {
-	batteries := []BatteryType{
-		{
-			ID:               1,
-			Title:            "Li-ion (литий-ионный)",
-			CapacityMah:      3000,
-			VoltageV:         3.7,
-			Photo:            "li_ion.jpg",
-			Video:            "li_ion.mp4",
-			ShortDescription: "Высокая удельная энергия, малый саморазряд",
-			Description:      "Литий-ионные аккумуляторы широко применяются в смартфонах, ноутбуках, электротранспорте. Характеризуются высокой плотностью энергии, отсутствием эффекта памяти. Номинальное напряжение одной ячейки обычно 3,6–3,7 В.",
-		},
-		{
-			ID:               2,
-			Title:            "Li-Po (литий-полимерный)",
-			CapacityMah:      1500,
-			VoltageV:         3.7,
-			Photo:            "li_po.jpg",
-			Video:            "li_po.mp4",
-			ShortDescription: "Гибкая форма, малый вес, высокая токоотдача",
-			Description:      "Литий-полимерные аккумуляторы позволяют делать батареи тонкими и гибкими. Часто применяются в дронах, носимой электронике. По удельной энергии и напряжению близки к Li-ion.",
-		},
-		{
-			ID:               3,
-			Title:            "Ni-MH (никель-металлгидридный)",
-			CapacityMah:      2500,
-			VoltageV:         1.2,
-			Photo:            "ni_mh.jpg",
-			Video:            "ni_mh.mp4",
-			ShortDescription: "Экологичность, перезаряжаемость, стабильность при низких температурах",
-			Description:      "Никель-металлгидридные аккумуляторы — перезаряжаемая альтернатива без кадмия. Номинальное напряжение элемента 1,2 В. Используются в бытовой технике, гибридном транспорте.",
-		},
-	}
-	return batteries, nil
-}
-
-func (r *Repository) GetBattery(id int) (BatteryType, error) {
-	batteries, err := r.GetBatteryTypes()
-	if err != nil {
-		return BatteryType{}, err
-	}
-	for _, b := range batteries {
-		if b.ID == id {
-			return b, nil
-		}
-	}
-	return BatteryType{}, fmt.Errorf("тип аккумулятора не найден")
-}
-
-func (r *Repository) GetBatteryByTitle(title string) ([]BatteryType, error) {
-	batteries, err := r.GetBatteryTypes()
-	if err != nil {
-		return nil, err
-	}
-	var result []BatteryType
-	lower := strings.ToLower(title)
-	for _, b := range batteries {
-		if strings.Contains(strings.ToLower(b.Title), lower) {
-			result = append(result, b)
-		}
-	}
-	return result, nil
+	TotalRuntimeHours float64
+	Status            string
 }
 
 func RuntimeHours(capacityMah, currentMa int) float64 {
@@ -114,98 +61,278 @@ func RuntimeHours(capacityMah, currentMa int) float64 {
 	return float64(capacityMah) / float64(currentMa)
 }
 
-func (r *Repository) buildBatteryLife(id int, title, description string, entries []struct {
-	BatteryID int
-	CurrentMa int
-	Quantity  int
-}) (BatteryLife, error) {
-	batteries, err := r.GetBatteryTypes()
-	if err != nil {
+func (r *Repository) GetBatteryTypes() ([]BatteryType, error) {
+	var rows []models.BatteryType
+	if err := r.db.Where("is_deleted = ?", false).Find(&rows).Error; err != nil {
+		return nil, err
+	}
+	out := make([]BatteryType, len(rows))
+	for i := range rows {
+		photo := ""
+		if rows[i].Photo != nil {
+			photo = *rows[i].Photo
+		}
+		out[i] = BatteryType{
+			ID:               int(rows[i].ID),
+			Title:            rows[i].Title,
+			CapacityMah:      rows[i].CapacityMah,
+			VoltageV:         rows[i].VoltageV,
+			Photo:            photo,
+			Video:            rows[i].Video,
+			ShortDescription: rows[i].ShortDescription,
+			Description:      rows[i].Description,
+		}
+	}
+	return out, nil
+}
+
+func (r *Repository) GetBattery(id int) (BatteryType, error) {
+	var m models.BatteryType
+	if err := r.db.Where("id = ? AND is_deleted = ?", id, false).First(&m).Error; err != nil {
+		return BatteryType{}, err
+	}
+	photo := ""
+	if m.Photo != nil {
+		photo = *m.Photo
+	}
+	return BatteryType{
+		ID:               int(m.ID),
+		Title:            m.Title,
+		CapacityMah:      m.CapacityMah,
+		VoltageV:         m.VoltageV,
+		Photo:            photo,
+		Video:            m.Video,
+		ShortDescription: m.ShortDescription,
+		Description:      m.Description,
+	}, nil
+}
+
+func (r *Repository) GetBatteryByTitle(title string) ([]BatteryType, error) {
+	var rows []models.BatteryType
+	if err := r.db.Where("is_deleted = ? AND title ILIKE ?", false, "%"+title+"%").Find(&rows).Error; err != nil {
+		return nil, err
+	}
+	out := make([]BatteryType, len(rows))
+	for i := range rows {
+		photo := ""
+		if rows[i].Photo != nil {
+			photo = *rows[i].Photo
+		}
+		out[i] = BatteryType{
+			ID:               int(rows[i].ID),
+			Title:            rows[i].Title,
+			CapacityMah:      rows[i].CapacityMah,
+			VoltageV:         rows[i].VoltageV,
+			Photo:            photo,
+			Video:            rows[i].Video,
+			ShortDescription: rows[i].ShortDescription,
+			Description:      rows[i].Description,
+		}
+	}
+	return out, nil
+}
+
+func (r *Repository) GetDraftID(creatorID uint) (uint, bool) {
+	var lives []models.BatteryLife
+	r.db.Where("creator_id = ? AND status = ?", creatorID, models.StatusDraft).Select("id").Limit(1).Find(&lives)
+	if len(lives) == 0 {
+		return 0, false
+	}
+	return lives[0].ID, true
+}
+
+func (r *Repository) GetCartCount(creatorID uint) int64 {
+	draftID, ok := r.GetDraftID(creatorID)
+	if !ok {
+		return 0
+	}
+	var count int64
+	r.db.Model(&models.BatteryLifeItem{}).Where("battery_life_id = ?", draftID).Count(&count)
+	return count
+}
+
+// GetBatteryLives возвращает заявки пользователя, кроме удалённых
+func (r *Repository) GetBatteryLives(creatorID uint) ([]BatteryLife, error) {
+	var rows []models.BatteryLife
+	if err := r.db.Where("creator_id = ? AND status != ?", creatorID, models.StatusDeleted).
+		Preload("Items.BatteryType").Find(&rows).Error; err != nil {
+		return nil, err
+	}
+	out := make([]BatteryLife, 0, len(rows))
+	for _, row := range rows {
+		bl := rowToBatteryLife(&row)
+		out = append(out, bl)
+	}
+	return out, nil
+}
+
+func (r *Repository) GetBatteryLife(id int, creatorID uint) (BatteryLife, error) {
+	var row models.BatteryLife
+	if err := r.db.Where("id = ? AND creator_id = ? AND status != ?", id, creatorID, models.StatusDeleted).
+		Preload("Items.BatteryType").First(&row).Error; err != nil {
 		return BatteryLife{}, err
 	}
-	batteryMap := make(map[int]BatteryType)
-	for _, b := range batteries {
-		batteryMap[b.ID] = b
-	}
-	var items []BatteryLifeItem
-	var totalRuntime float64
-	for _, e := range entries {
-		b, ok := batteryMap[e.BatteryID]
-		if !ok {
-			continue
+	return rowToBatteryLife(&row), nil
+}
+
+func rowToBatteryLife(row *models.BatteryLife) BatteryLife {
+	items := make([]BatteryLifeItem, 0, len(row.Items))
+	for i := range row.Items {
+		bt := BatteryType{}
+		if row.Items[i].BatteryType.ID != 0 {
+			photo := ""
+			if row.Items[i].BatteryType.Photo != nil {
+				photo = *row.Items[i].BatteryType.Photo
+			}
+			bt = BatteryType{
+				ID:               int(row.Items[i].BatteryType.ID),
+				Title:            row.Items[i].BatteryType.Title,
+				CapacityMah:      row.Items[i].BatteryType.CapacityMah,
+				VoltageV:         row.Items[i].BatteryType.VoltageV,
+				Photo:            photo,
+				Video:            row.Items[i].BatteryType.Video,
+				ShortDescription: row.Items[i].BatteryType.ShortDescription,
+				Description:      row.Items[i].BatteryType.Description,
+			}
 		}
-		qty := e.Quantity
+		qty := row.Items[i].Quantity
 		if qty <= 0 {
 			qty = 1
 		}
-		rh := RuntimeHours(b.CapacityMah, e.CurrentMa)
+		rh := row.Items[i].RuntimeHours
 		rt := rh * float64(qty)
 		items = append(items, BatteryLifeItem{
-			Battery:      b,
-			CurrentMa:    e.CurrentMa,
-			Mm:           fmt.Sprintf("%d", qty), // м-м: количество (в лабе 2+ будет редактироваться)
+			Battery:      bt,
+			CurrentMa:    row.Items[i].CurrentMa,
+			Mm:           fmt.Sprintf("%d", qty),
 			Quantity:     qty,
 			RuntimeHours: rh,
 			RuntimeTotal: rt,
 		})
-		totalRuntime += rt
+	}
+	total := 0.0
+	for _, it := range items {
+		total += it.RuntimeTotal
 	}
 	return BatteryLife{
-		ID:                id,
-		Title:             title,
-		Description:       description,
+		ID:                int(row.ID),
+		Title:             row.Title,
+		Description:       row.Description,
 		Items:             items,
 		ItemCount:         len(items),
-		TotalRuntimeHours: totalRuntime,
+		TotalRuntimeHours: total,
+		Status:            row.Status,
+	}
+}
+
+func (r *Repository) GetBatteryLifeForBattery(batteryID int, creatorID uint) (*BatteryLifeItem, error) {
+	draftID, ok := r.GetDraftID(creatorID)
+	if !ok {
+		return nil, nil
+	}
+	var items []models.BatteryLifeItem
+	r.db.Where("battery_life_id = ? AND battery_type_id = ?", draftID, batteryID).
+		Preload("BatteryType").Limit(1).Find(&items)
+	if len(items) == 0 {
+		return nil, nil
+	}
+	item := items[0]
+	photo := ""
+	if item.BatteryType.Photo != nil {
+		photo = *item.BatteryType.Photo
+	}
+	qty := item.Quantity
+	if qty <= 0 {
+		qty = 1
+	}
+	rh := item.RuntimeHours
+	return &BatteryLifeItem{
+		Battery: BatteryType{
+			ID:               int(item.BatteryType.ID),
+			Title:            item.BatteryType.Title,
+			CapacityMah:      item.BatteryType.CapacityMah,
+			VoltageV:         item.BatteryType.VoltageV,
+			Photo:            photo,
+			Video:            item.BatteryType.Video,
+			ShortDescription: item.BatteryType.ShortDescription,
+			Description:      item.BatteryType.Description,
+		},
+		CurrentMa:    item.CurrentMa,
+		Mm:           fmt.Sprintf("%d", qty),
+		Quantity:     qty,
+		RuntimeHours: rh,
+		RuntimeTotal: rh * float64(qty),
 	}, nil
 }
 
-func (r *Repository) GetBatteryLives() ([]BatteryLife, error) {
-	entries := []struct {
-		BatteryID int
-		CurrentMa int
-		Quantity  int
-	}{
-		{1, 500, 1},
-		{2, 300, 2},
-		{3, 200, 3},
-	}
-	app, err := r.buildBatteryLife(
-		1,
-		"Расчёт времени работы в часах для устройства с указанным потребляемым током и выбранным типом аккумулятора",
-		"Расчёт времени работы в часах для устройства с указанным потребляемым током и выбранным типом аккумулятора. Время (ч) = ёмкость (мА·ч) / ток (мА).",
-		entries,
-	)
+// AddBatteryToBatteryLife добавляет услугу в заявку (черновик). Создаёт черновик, если его нет. Через ORM.
+func (r *Repository) AddBatteryToBatteryLife(creatorID uint, batteryTypeID int, currentMa, quantity int) error {
+	var draft models.BatteryLife
+	err := r.db.Where("creator_id = ? AND status = ?", creatorID, models.StatusDraft).First(&draft).Error
 	if err != nil {
-		return nil, err
-	}
-	return []BatteryLife{app}, nil
-}
-
-func (r *Repository) GetBatteryLife(id int) (BatteryLife, error) {
-	lives, err := r.GetBatteryLives()
-	if err != nil {
-		return BatteryLife{}, err
-	}
-	for _, life := range lives {
-		if life.ID == id {
-			return life, nil
-		}
-	}
-	return BatteryLife{}, fmt.Errorf("battery life не найдена")
-}
-
-func (r *Repository) GetBatteryLifeForBattery(batteryID int) (*BatteryLifeItem, error) {
-	lives, err := r.GetBatteryLives()
-	if err != nil {
-		return nil, err
-	}
-	for _, life := range lives {
-		for i := range life.Items {
-			if life.Items[i].Battery.ID == batteryID {
-				return &life.Items[i], nil
+		if err == gorm.ErrRecordNotFound {
+			draft = models.BatteryLife{
+				Status:    models.StatusDraft,
+				CreatedAt: time.Now(),
+				CreatorID: creatorID,
+				Title:     "Расчёт времени работы",
+				Description: "Время (ч) = ёмкость (мА·ч) / ток (мА).",
 			}
+			if err = r.db.Create(&draft).Error; err != nil {
+				return err
+			}
+		} else {
+			return err
 		}
 	}
-	return nil, fmt.Errorf("аккумулятор не найден в battery life")
+
+	var bt models.BatteryType
+	if err := r.db.Where("id = ? AND is_deleted = ?", batteryTypeID, false).First(&bt).Error; err != nil {
+		return err
+	}
+	runtimeHours := RuntimeHours(bt.CapacityMah, currentMa)
+	if quantity <= 0 {
+		quantity = 1
+	}
+
+	var existing models.BatteryLifeItem
+	err = r.db.Where("battery_life_id = ? AND battery_type_id = ?", draft.ID, batteryTypeID).First(&existing).Error
+	if err == nil {
+		// уже в заявке — обновляем ток, добавляем к количеству
+		newQty := existing.Quantity + quantity
+		newMa := currentMa
+		newRuntime := RuntimeHours(bt.CapacityMah, newMa)
+		return r.db.Model(&existing).Updates(map[string]interface{}{
+			"current_ma":     newMa,
+			"quantity":      newQty,
+			"runtime_hours": newRuntime,
+		}).Error
+	}
+	if err != gorm.ErrRecordNotFound {
+		return err
+	}
+
+	item := models.BatteryLifeItem{
+		BatteryLifeID: draft.ID,
+		BatteryTypeID: uint(batteryTypeID),
+		CurrentMa:     currentMa,
+		Quantity:      quantity,
+		RuntimeHours:  runtimeHours,
+	}
+	return r.db.Create(&item).Error
+}
+
+// DeleteBatteryLife логическое удаление заявки: SQL UPDATE без ORM
+func (r *Repository) DeleteBatteryLife(id int, creatorID uint) error {
+	res := r.db.Exec(
+		"UPDATE battery_lives SET status = ? WHERE id = ? AND creator_id = ? AND status = ?",
+		models.StatusDeleted, id, creatorID, models.StatusDraft,
+	)
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return fmt.Errorf("заявка не найдена или уже удалена")
+	}
+	return nil
 }
