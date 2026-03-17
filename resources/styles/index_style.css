@@ -338,7 +338,7 @@ a.battery-life-card:hover .battery-life-card__info {
     align-items: stretch;
 }
 
-/* Карточки типов аккумуляторов: две крайние F6F8FA, центральная белая, без обводки, hover — текст 2CB4C2 */
+/* Карточки типов аккумуляторов: шахматная раскладка по строкам (1-я строка: серый, белый, серый; 2-я строка и далее — продолжение шахматки) */
 .card {
     display: flex;
     flex-direction: column;
@@ -354,12 +354,12 @@ a.battery-life-card:hover .battery-life-card__info {
     color: var(--neter-text);
 }
 
-.card:nth-child(3n+1),
-.card:nth-child(3n+3) {
+/* Шахматная раскраска: нечётные карточки (1,3,5...) — серый, чётные (2,4,6...) — белый */
+.card:nth-child(odd) {
     background-color: var(--neter-card-bg);
 }
 
-.card:nth-child(3n+2) {
+.card:nth-child(even) {
     background-color: var(--neter-white);
 }
 
@@ -435,23 +435,45 @@ a.battery-life-card:hover .battery-life-card__info {
 }
 
 .detail-wrapper {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 30px auto;
     padding: 0 20px;
 }
 
 .detail-card {
     background-color: var(--neter-card-bg);
-    border-radius: 12px;
+    border-radius: 16px;
     border: none;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    display: grid;
+    grid-template-columns: minmax(320px, 460px) minmax(0, 1fr);
+    gap: 0;
+}
+
+.detail-card__media {
+    background-color: var(--neter-card-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 28px;
+}
+
+.detail-card__video-frame {
+    width: 100%;
+    max-width: 360px;
+    aspect-ratio: 9 / 16;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+    background: var(--neter-card-bg);
+    position: relative;
 }
 
 .detail-card__video {
     width: 100%;
-    max-height: 420px;
-    background-color: var(--neter-text);
+    height: 100%;
+    object-fit: cover;
     display: block;
 }
 
@@ -760,6 +782,12 @@ a.battery-life-card:hover .battery-life-card__info {
     }
     .detail-wrapper {
         padding: 0 10px;
+    }
+    .detail-card {
+        grid-template-columns: 1fr;
+    }
+    .detail-card__media {
+        padding: 20px 16px;
     }
     .detail-card__body {
         padding: 20px;

@@ -24,6 +24,6 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("repository: %v", err)
 	}
-	logrus.Info("Battery life service start!")
+	logrus.Info("Подборка товаров service start!")
 	api.StartServer(cfg, repo)
 }

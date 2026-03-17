@@ -1,6 +1,6 @@
 <html lang="ru">
     <head>
-        <title>Battery life № {{ .batteryLife.ID }} — расчёт времени работы</title>
+        <title>Подборка № {{ .batteryLife.ID }} — время работы набора</title>
         <link rel="stylesheet" href="/static/styles/index_style.css?v=neter">
     </head>
     <header class="header-center">
@@ -9,20 +9,20 @@
         </a>
     </header>
     <div class="battery-life-detail">
-        <a href="/" class="back-link">← Вернуться к списку типов аккумуляторов</a>
+        <a href="/" class="back-link">← Вернуться к списку товаров</a>
         <div class="battery-life-detail__header-card">
-            <h1 class="battery-life-detail__title">Battery life № {{ .batteryLife.ID }}</h1>
+            <h1 class="battery-life-detail__title">Подборка № {{ .batteryLife.ID }}</h1>
             <div class="battery-life-detail__info">
                 <div class="battery-life-detail__info-item"><strong>Описание:</strong> {{ .batteryLife.Description }}</div>
             </div>
             <div class="battery-life-detail__result">
-                <strong>Суммарное время работы (battery life):</strong>
+                <strong>Суммарное время работы набора:</strong>
                 <span class="battery-life-detail__result-value">{{ printf "%.2f" .batteryLife.TotalRuntimeHours }} ч</span>
             </div>
             {{ if .isDraft }}
             <form action="/battery-life/delete" method="POST" style="margin-top:16px;">
                 <input type="hidden" name="battery_life_id" value="{{ .batteryLife.ID }}">
-                <button type="submit" class="cart-button" style="background-color: var(--neter-text-muted);">Удалить заявку</button>
+                <button type="submit" class="cart-button" style="background-color: var(--neter-text-muted);">Удалить подборку</button>
             </form>
             {{ end }}
         </div>
@@ -34,7 +34,7 @@
                     <th>Ёмкость и напряжение</th>
                     <th>Потребляемый ток</th>
                     <th>Количество</th>
-                    <th>Battery life (ч)</th>
+                    <th>Время работы (ч)</th>
                 </tr>
             </thead>
             <tbody>
@@ -53,7 +53,7 @@
                 </tr>
                 {{ end }}
                 <tr class="battery-life-table__total-row">
-                    <td colspan="4" class="battery-life-table__total-label">Результат (суммарное battery life):</td>
+                    <td colspan="4" class="battery-life-table__total-label">Результат (суммарное время работы набора):</td>
                     <td class="battery-life-table__col-result battery-life-table__total-value">{{ printf "%.2f" .batteryLife.TotalRuntimeHours }} ч</td>
                 </tr>
             </tbody>

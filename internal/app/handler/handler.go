@@ -63,14 +63,14 @@ func (h *Handler) GetBattery(ctx *gin.Context) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		logrus.Error(err)
-		ctx.AbortWithStatus(http.StatusBadRequest)
+		ctx.Redirect(http.StatusFound, "/")
 		return
 	}
 
 	battery, err := h.Repository.GetBattery(id)
 	if err != nil {
 		logrus.Error(err)
-		ctx.AbortWithStatus(http.StatusNotFound)
+		ctx.Redirect(http.StatusFound, "/")
 		return
 	}
 
@@ -91,14 +91,14 @@ func (h *Handler) GetBatteryLife(ctx *gin.Context) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		logrus.Error(err)
-		ctx.AbortWithStatus(http.StatusBadRequest)
+		ctx.Redirect(http.StatusFound, "/")
 		return
 	}
 
 	life, err := h.Repository.GetBatteryLife(id, creatorID)
 	if err != nil {
 		logrus.Error(err)
-		ctx.AbortWithStatus(http.StatusNotFound)
+		ctx.Redirect(http.StatusFound, "/")
 		return
 	}
 
