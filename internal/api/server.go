@@ -18,6 +18,8 @@ func StartServer(cfg *config.Config, repo *repository.Repository) {
 	r.LoadHTMLGlob("templates/*")
 	r.Static("/static", "./resources")
 
+	h.RegisterAPI(r)
+
 	r.GET("/", h.GetBatteryTypes)
 	r.GET("/battery/:id", h.GetBattery)
 	r.GET("/battery-life/:id", h.GetBatteryLife)

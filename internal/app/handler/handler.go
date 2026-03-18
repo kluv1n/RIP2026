@@ -10,8 +10,6 @@ import (
 	"RIP2026/internal/app/repository"
 )
 
-const defaultCreatorID = 1
-
 type Handler struct {
 	Repository *repository.Repository
 }
@@ -21,7 +19,7 @@ func NewHandler(r *repository.Repository) *Handler {
 }
 
 func (h *Handler) GetBatteryTypes(ctx *gin.Context) {
-	creatorID := uint(defaultCreatorID)
+	creatorID := uint(h.Repository.GetCreatorID())
 	var batteries []repository.BatteryType
 	var err error
 
@@ -58,7 +56,7 @@ func (h *Handler) GetBatteryTypes(ctx *gin.Context) {
 }
 
 func (h *Handler) GetBattery(ctx *gin.Context) {
-	creatorID := uint(defaultCreatorID)
+	creatorID := uint(h.Repository.GetCreatorID())
 	idStr := ctx.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -86,7 +84,7 @@ func (h *Handler) GetBattery(ctx *gin.Context) {
 }
 
 func (h *Handler) GetBatteryLife(ctx *gin.Context) {
-	creatorID := uint(defaultCreatorID)
+	creatorID := uint(h.Repository.GetCreatorID())
 	idStr := ctx.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -105,12 +103,12 @@ func (h *Handler) GetBatteryLife(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "battery_life.html", gin.H{
 		"batteryLife":    life,
 		"runtimeSummary": fmt.Sprintf("%.2f ч", life.TotalRuntimeHours),
-		"isDraft":       life.Status == "черновик",
+		"isDraft":       life.Status == "draft",
 	})
 }
 
 func (h *Handler) AddBatteryToBatteryLife(ctx *gin.Context) {
-	creatorID := uint(defaultCreatorID)
+	creatorID := uint(h.Repository.GetCreatorID())
 	batteryID, _ := strconv.Atoi(ctx.PostForm("battery_id"))
 	currentMa, _ := strconv.Atoi(ctx.PostForm("current_ma"))
 	if currentMa <= 0 {
@@ -137,7 +135,7 @@ func (h *Handler) AddBatteryToBatteryLife(ctx *gin.Context) {
 }
 
 func (h *Handler) DeleteBatteryLife(ctx *gin.Context) {
-	creatorID := uint(defaultCreatorID)
+	creatorID := uint(h.Repository.GetCreatorID())
 	idStr := ctx.PostForm("battery_life_id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -149,4 +147,37 @@ func (h *Handler) DeleteBatteryLife(ctx *gin.Context) {
 		logrus.Error(err)
 	}
 	ctx.Redirect(http.StatusFound, "/")
+}
+
+// RegisterAPI регистрирует маршруты REST API под префиксом /api
+func (h *Handler) RegisterAPI(router *gin.Engine) {
+	api := router.Group("/api")
+	batteryTypes := api.Group("/battery_types")
+	{
+		batteryTypes.GET("", h.APIGetBatteryTypes)
+		batteryTypes.GET("/:id", h.APIGetBatteryType)
+		batteryTypes.POST("", h.APICreateBatteryType)
+	}
+	batteryLives := api.Group("/battery_lives")
+	{
+		batteryLives.GET("/cart", h.APIGetBatteryLifeCart)
+		batteryLives.GET("", h.APIGetBatteryLives)
+		batteryLives.GET("/:id", h.APIGetBatteryLife)
+		batteryLives.PUT("/:id", h.APIEditBatteryLife)
+		batteryLives.PUT("/:id/form", h.APIFormBatteryLife)
+		batteryLives.PUT("/:id/finish", h.APIFinishBatteryLife)
+		batteryLives.DELETE("/:id", h.APIDeleteBatteryLife)
+	}
+	batteryLifeItems := api.Group("/battery_life_items")
+	{
+		batteryLifeItems.POST("/add/:battery_type_id", h.APIAddToBatteryLife)
+		batteryLifeItems.DELETE("/:battery_type_id/:battery_life_id", h.APIDeleteFromBatteryLife)
+		batteryLifeItems.PUT("/:battery_type_id/:battery_life_id", h.APIEditInBatteryLife)
+	}
+	users := api.Group("/users")
+	{
+		users.POST("/register", h.APICreateUser)
+		users.POST("/login", h.APISignIn)
+		users.POST("/logout", h.APISignOut)
+	}
 }

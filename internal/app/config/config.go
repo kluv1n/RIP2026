@@ -11,6 +11,7 @@ import (
 type Config struct {
 	ServiceHost string
 	ServicePort int
+	MinioURL    string
 }
 
 func NewConfig() (*Config, error) {
@@ -26,13 +27,32 @@ func NewConfig() (*Config, error) {
 	viper.AddConfigPath("config")
 	viper.AddConfigPath(".")
 	if err := viper.ReadInConfig(); err != nil {
-		return nil, err
+		cfg := &Config{
+			ServiceHost: "0.0.0.0",
+			ServicePort: 8080,
+			MinioURL:    getMinioURL(),
+		}
+		logrus.Info("config loaded (defaults)")
+		return cfg, nil
 	}
 
 	cfg := &Config{}
 	if err := viper.Unmarshal(cfg); err != nil {
 		return nil, err
 	}
+	if cfg.ServicePort == 0 {
+		cfg.ServicePort = 8080
+	}
+	if cfg.MinioURL == "" {
+		cfg.MinioURL = getMinioURL()
+	}
 	logrus.Info("config parsed")
 	return cfg, nil
+}
+
+func getMinioURL() string {
+	if url := os.Getenv("MINIO_URL"); url != "" {
+		return url
+	}
+	return "http://localhost:9000/batteries"
 }

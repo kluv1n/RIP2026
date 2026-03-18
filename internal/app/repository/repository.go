@@ -1,18 +1,32 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
+	"RIP2026/internal/app/minioClient"
 	"RIP2026/internal/app/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"github.com/minio/minio-go/v7"
 )
 
-const defaultCreatorID = 1
+var (
+	ErrNotFound      = errors.New("not found")
+	ErrAlreadyExists = errors.New("already exists")
+	ErrNotAllowed    = errors.New("not allowed")
+	ErrNoDraft       = errors.New("no draft for this user")
+)
+
+// creatorUserID — создатель зафиксирован константой (методичка лаб.3).
+const creatorUserID = 1
 
 type Repository struct {
-	db *gorm.DB
+	db     *gorm.DB
+	mc     *minio.Client
+	userID int
 }
 
 func New(dsn string) (*Repository, error) {
@@ -20,7 +34,27 @@ func New(dsn string) (*Repository, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Repository{db: db}, nil
+	mc, err := minioClient.InitMinio()
+	if err != nil {
+		return nil, err
+	}
+	return &Repository{db: db, mc: mc, userID: creatorUserID}, nil
+}
+
+func (r *Repository) GetCreatorID() int {
+	return creatorUserID
+}
+
+func (r *Repository) GetUserID() int {
+	return r.userID
+}
+
+func (r *Repository) SetUserID(id int) {
+	r.userID = id
+}
+
+func (r *Repository) SignOut() {
+	r.userID = 0
 }
 
 // DTO для шаблонов (совместимы с прежними полями)
@@ -60,6 +94,8 @@ func RuntimeHours(capacityMah, currentMa int) float64 {
 	}
 	return float64(capacityMah) / float64(currentMa)
 }
+
+const defaultCreatorID = 1
 
 func (r *Repository) GetBatteryTypes() ([]BatteryType, error) {
 	var rows []models.BatteryType

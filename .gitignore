@@ -19,3 +19,7 @@ vendor/
 # Archives (installers etc.)
 *.tar.gz
 *.zip
+
+# Postman
+postman/
+RIP2026_Lab3_Postman_Collection.json

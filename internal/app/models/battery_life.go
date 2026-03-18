@@ -2,13 +2,13 @@ package models
 
 import "time"
 
-// Статусы заявки: черновик, удалён, сформирован, завершён, отклонён
+// Статусы заявки (API и БД — на английском, как в методичке/скринах)
 const (
-	StatusDraft     = "черновик"
-	StatusDeleted   = "удалён"
-	StatusFormed    = "сформирован"
-	StatusCompleted = "завершён"
-	StatusRejected  = "отклонён"
+	StatusDraft     = "draft"
+	StatusDeleted   = "deleted"
+	StatusFormed    = "formed"
+	StatusCompleted = "completed"
+	StatusRejected  = "rejected"
 )
 
 // BatteryLife — заявка (расчёт времени работы): id, статус, дата создания, создатель; даты формирования/завершения, модератор
