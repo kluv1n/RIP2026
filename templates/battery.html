@@ -1,7 +1,7 @@
 <html lang="ru">
     <head>
         <title>{{ .battery.Title }} — подборка товара для шорта</title>
-        <link rel="stylesheet" href="/static/styles/index_style.css?v=neter">
+        <link rel="stylesheet" href="/static/styles/index_style.css?v=neter8">
     </head>
     <header class="header-center">
         <a href="/" class="header-logo" aria-label="На главную">
@@ -12,29 +12,18 @@
         <a href="/" class="back-link">← Вернуться к списку товаров</a>
         <div class="detail-card">
             <div class="detail-card__media">
-                <div class="detail-card__video-frame">
+                <div class="detail-card__video-frame detail-card__video-frame--desc">
                     <video class="detail-card__video" controls autoplay muted loop playsinline>
                         <source src="http://localhost:9000/test/{{ .battery.Video }}" type="video/mp4">
                     </video>
+                    <div class="detail-video-desc">
+                        <p class="detail-video-desc__text">{{ .videoDescriptionOverlay }}</p>
+                    </div>
                 </div>
             </div>
             <div class="detail-card__body">
                 <h1 class="detail-card__title">{{ .battery.Title }}</h1>
                 <p class="detail-card__employees">Ёмкость и напряжение: {{ .battery.CapacityMah }} мА·ч, {{ .battery.VoltageV }} В</p>
-                <p class="detail-card__description">{{ .battery.Description }}</p>
-                {{ if .hasInBatteryLife }}
-                <hr class="detail-card__separator">
-                <h2 class="detail-card__section-title">Подборка для этого товара</h2>
-                <div class="manager-block">
-                    <div class="manager-block__name">Потребляемый ток: {{ .batteryLifeItem.CurrentMa }} мА</div>
-                    <div class="manager-block__meta">
-                        <span><strong>Время работы:</strong> {{ printf "%.2f" .batteryLifeItem.RuntimeHours }} ч</span>
-                        <span><strong>Количество:</strong> {{ .batteryLifeItem.Mm }}</span>
-                    </div>
-                </div>
-                {{ end }}
-                <hr class="detail-card__separator">
-                <h2 class="detail-card__section-title">Добавить в подборку</h2>
                 <form action="/battery-life/add" method="POST" class="add-to-cart-form">
                     <input type="hidden" name="battery_id" value="{{ .batteryID }}">
                     <input type="hidden" name="return_to" value="battery">

@@ -7,7 +7,8 @@ type BatteryLifeItem struct {
 	BatteryTypeID  uint    `gorm:"not null;uniqueIndex:idx_battery_life_type"`
 	CurrentMa      int     `gorm:"not null"`             // потребляемый ток, мА
 	Quantity       int     `gorm:"not null"`             // м-м: количество
-	SortOrder      int     `gorm:"not null;default:0"`   // порядок в заявке
+	// SortOrder — порядок отображения позиций в заявке (сортировка при выборке из БД); не «ввод пользователя», служебное поле по методичке (м-м: порядок).
+	SortOrder      int     `gorm:"not null;default:0"`
 	RuntimeHours   float64 `gorm:"type:decimal(12,4)"`  // время работы (ёмкость/ток), ч
 
 	BatteryLife BatteryLife `gorm:"foreignKey:BatteryLifeID"`

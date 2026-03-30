@@ -1,7 +1,7 @@
 <html lang="ru">
     <head>
         <title>Подборка № {{ .batteryLife.ID }} — время работы набора</title>
-        <link rel="stylesheet" href="/static/styles/index_style.css?v=neter">
+        <link rel="stylesheet" href="/static/styles/index_style.css?v=neter8">
     </head>
     <header class="header-center">
         <a href="/" class="header-logo" aria-label="На главную">
@@ -13,7 +13,9 @@
         <div class="battery-life-detail__header-card">
             <h1 class="battery-life-detail__title">Подборка № {{ .batteryLife.ID }}</h1>
             <div class="battery-life-detail__info">
-                <div class="battery-life-detail__info-item"><strong>Описание:</strong> {{ .batteryLife.Description }}</div>
+                <div class="battery-life-detail__info-item"><strong>Название заявки:</strong> {{ if .batteryLife.Title }}{{ .batteryLife.Title }}{{ else }}—{{ end }}</div>
+                <div class="battery-life-detail__info-item"><strong>Описание:</strong> {{ if .batteryLife.Description }}{{ .batteryLife.Description }}{{ else }}—{{ end }}</div>
+                <div class="battery-life-detail__info-item"><strong>Статус:</strong> {{ .statusLabel }}</div>
             </div>
             <div class="battery-life-detail__result">
                 <strong>Суммарное время работы набора:</strong>
@@ -27,37 +29,49 @@
             {{ end }}
         </div>
 
-        <table class="battery-life-table">
-            <thead>
-                <tr>
-                    <th class="battery-life-table__col-photo">Фото</th>
-                    <th>Ёмкость и напряжение</th>
-                    <th>Потребляемый ток</th>
-                    <th>Количество</th>
-                    <th>Время работы (ч)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{ range .batteryLife.Items }}
-                <tr>
-                    <td class="battery-life-table__col-photo">
-                        <img src="http://localhost:9000/test/{{ .Battery.Photo }}" alt="img">
-                    </td>
-                    <td>
-                        <div><strong>{{ .Battery.Title }}</strong></div>
-                        <div>Ёмкость: {{ .Battery.CapacityMah }} мА·ч, напряжение: {{ .Battery.VoltageV }} В</div>
-                    </td>
-                    <td>{{ .CurrentMa }}</td>
-                    <td>{{ .Mm }}</td>
-                    <td class="battery-life-table__col-result">{{ printf "%.2f" .RuntimeTotal }}</td>
-                </tr>
-                {{ end }}
-                <tr class="battery-life-table__total-row">
-                    <td colspan="4" class="battery-life-table__total-label">Результат (суммарное время работы набора):</td>
-                    <td class="battery-life-table__col-result battery-life-table__total-value">{{ printf "%.2f" .batteryLife.TotalRuntimeHours }} ч</td>
-                </tr>
-            </tbody>
-        </table>
+        <h2 class="battery-life-detail__section-title">Услуги в заявке</h2>
+        <div class="battery-life-items">
+            {{ range .batteryLife.Items }}
+            <article class="battery-life-item-card">
+                <div class="battery-life-item-card__media">
+                    {{ if .Battery.Photo }}
+                    <img class="battery-life-item-card__photo" src="{{ $.mediaBase }}/{{ .Battery.Photo }}" alt="{{ .Battery.Title }}">
+                    {{ else }}
+                    <div class="battery-life-item-card__photo battery-life-item-card__photo--placeholder">Нет фото</div>
+                    {{ end }}
+                    {{ if .Battery.Video }}
+                    <div class="battery-life-item-card__video-block">
+                        <video class="battery-life-item-card__video" controls muted playsinline preload="metadata">
+                            <source src="{{ $.mediaBase }}/{{ .Battery.Video }}" type="video/mp4">
+                        </video>
+                        <a class="battery-life-item-card__video-link" href="{{ $.mediaBase }}/{{ .Battery.Video }}" target="_blank" rel="noopener">Открыть видео в новой вкладке</a>
+                    </div>
+                    {{ else }}
+                    <div class="battery-life-item-card__video-block battery-life-item-card__video-block--empty">Видео не указано</div>
+                    {{ end }}
+                </div>
+                <div class="battery-life-item-card__body">
+                    <h3 class="battery-life-item-card__title">{{ .Battery.Title }}</h3>
+                    <p class="battery-life-item-card__line"><strong>Ёмкость и напряжение:</strong> {{ .Battery.CapacityMah }} мА·ч, {{ .Battery.VoltageV }} В</p>
+                    {{ if .Battery.ShortDescription }}
+                    <p class="battery-life-item-card__line battery-life-item-card__short">{{ .Battery.ShortDescription }}</p>
+                    {{ end }}
+                    <div class="battery-life-item-card__user-fields">
+                        <p class="battery-life-item-card__line"><strong>Потребляемый ток (ввод пользователя):</strong> {{ .CurrentMa }} мА</p>
+                        <p class="battery-life-item-card__line"><strong>Количество (ввод пользователя):</strong> {{ .Quantity }}</p>
+                    </div>
+                    <div class="battery-life-item-card__result">
+                        <p class="battery-life-item-card__line"><strong>Время работы на единицу:</strong> {{ printf "%.2f" .RuntimeHours }} ч</p>
+                        <p class="battery-life-item-card__line"><strong>По позиции (всего):</strong> {{ printf "%.2f" .RuntimeTotal }} ч</p>
+                    </div>
+                </div>
+            </article>
+            {{ end }}
+        </div>
+
+        <div class="battery-life-detail__footer-total">
+            <strong>Итог по заявке:</strong>
+            <span class="battery-life-detail__result-value">{{ printf "%.2f" .batteryLife.TotalRuntimeHours }} ч</span>
+        </div>
     </div>
 </html>
-

@@ -1,7 +1,7 @@
 <html lang="ru">
     <head>
-        <title>Подборка товаров — ролики и аксессуары</title>
-        <link rel="stylesheet" href="/static/styles/index_style.css?v=neter">
+        <title>Подборка товаров — типы аккумуляторов</title>
+        <link rel="stylesheet" href="/static/styles/index_style.css?v=neter8">
     </head>
     <header>
         <a href="/" class="header-logo" aria-label="На главную">
@@ -48,7 +48,9 @@
             {{ range .batteries }}
             <div class="card">
                 <a href="/battery/{{ .ID }}" class="card__link">
-                    <img src="http://localhost:9000/test/{{ .Photo }}" alt="img">
+                    <div class="card__media">
+                        <img class="card__photo" src="http://localhost:9000/test/{{ .Photo }}" alt="{{ .Title }}" width="400" height="300" decoding="async">
+                    </div>
                     <h1>{{ .Title }}</h1>
                     <p class="card__employees">Ёмкость и напряжение: {{ .CapacityMah }} мА·ч, {{ .VoltageV }} В</p>
                     <p class="card__description">{{ .ShortDescription }}</p>

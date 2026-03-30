@@ -10,6 +10,26 @@ import (
 	"RIP2026/internal/app/repository"
 )
 
+func batteryLifeStatusLabel(status string) string {
+	switch status {
+	case "draft", "черновик":
+		return "Черновик"
+	case "deleted", "удалён", "удален":
+		return "Удалена"
+	case "formed", "сформирован":
+		return "Сформирована"
+	case "completed", "завершён", "завершен":
+		return "Завершена"
+	case "rejected", "отклонён", "отклонен":
+		return "Отклонена"
+	default:
+		if status == "" {
+			return "—"
+		}
+		return status
+	}
+}
+
 type Handler struct {
 	Repository *repository.Repository
 }
@@ -76,10 +96,11 @@ func (h *Handler) GetBattery(ctx *gin.Context) {
 	hasInBatteryLife := batteryLifeItem != nil
 
 	ctx.HTML(http.StatusOK, "battery.html", gin.H{
-		"battery":          battery,
-		"batteryLifeItem":  batteryLifeItem,
-		"hasInBatteryLife": hasInBatteryLife,
-		"batteryID":        id,
+		"battery":                 battery,
+		"batteryLifeItem":         batteryLifeItem,
+		"hasInBatteryLife":        hasInBatteryLife,
+		"batteryID":               id,
+		"videoDescriptionOverlay": descriptionForVideoOverlay(battery.Description),
 	})
 }
 
@@ -100,10 +121,13 @@ func (h *Handler) GetBatteryLife(ctx *gin.Context) {
 		return
 	}
 
+	isDraft := life.Status == "draft" || life.Status == "черновик"
 	ctx.HTML(http.StatusOK, "battery_life.html", gin.H{
 		"batteryLife":    life,
 		"runtimeSummary": fmt.Sprintf("%.2f ч", life.TotalRuntimeHours),
-		"isDraft":       life.Status == "draft",
+		"isDraft":        isDraft,
+		"statusLabel":    batteryLifeStatusLabel(life.Status),
+		"mediaBase":      "http://localhost:9000/test",
 	})
 }
 

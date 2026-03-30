@@ -84,9 +84,8 @@ func (r *Repository) EditInBatteryLife(lifeID, batteryTypeID int, j serializer.B
 		return models.BatteryLifeItem{}, fmt.Errorf("%w: можно редактировать только черновик", ErrNotAllowed)
 	}
 	updates := map[string]interface{}{
-		"quantity":    j.Quantity,
-		"current_ma":  j.CurrentMa,
-		"sort_order": j.SortOrder,
+		"quantity":   j.Quantity,
+		"current_ma": j.CurrentMa,
 	}
 	var bt models.BatteryType
 	if err := r.db.First(&bt, item.BatteryTypeID).Error; err == nil {

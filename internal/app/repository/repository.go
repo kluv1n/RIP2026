@@ -250,6 +250,10 @@ func rowToBatteryLife(row *models.BatteryLife) BatteryLife {
 	for _, it := range items {
 		total += it.RuntimeTotal
 	}
+	// Если по строкам пока 0, но в заявке уже записан итог (например после завершения модератором) — показываем из БД
+	if total == 0 && row.TotalRuntimeHours > 0 {
+		total = row.TotalRuntimeHours
+	}
 	return BatteryLife{
 		ID:                int(row.ID),
 		Title:             row.Title,
