@@ -1,17 +1,33 @@
 package handler
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
-	"github.com/gin-gonic/gin"
 	"RIP2026/internal/app/repository"
 	"RIP2026/internal/app/serializer"
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 )
 
+// APICreateUser godoc
+// @Summary Регистрация пользователя
+// @Description Регистрирует нового пользователя. Возвращает login и is_moderator.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param user body serializer.SignUpRequest true "Логин и пароль"
+// @Success 201 {object} serializer.SignUpResponse
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Failure 409 {object} map[string]string
+// @Router /users/signup [post]
 func (h *Handler) APICreateUser(ctx *gin.Context) {
-	var j serializer.UserJSON
+	var j serializer.SignUpRequest
 	if err := ctx.BindJSON(&j); err != nil {
 		h.apiError(ctx, http.StatusBadRequest, err)
 		return
@@ -34,11 +50,23 @@ func (h *Handler) APICreateUser(ctx *gin.Context) {
 		return
 	}
 	ctx.Header("Location", fmt.Sprintf("/api/users/%d", user.ID))
-	ctx.JSON(http.StatusCreated, serializer.UserToJSON(user))
+	ctx.JSON(http.StatusCreated, serializer.SignUpResponseFromUser(user))
 }
 
+// APISignIn godoc
+// @Summary Вход (получение токена)
+// @Description Принимает логин/пароль, возвращает jwt-токен в формате {"token":"..."}.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param credentials body serializer.SignInRequest true "Логин и пароль"
+// @Success 200 {object} map[string]string "token"
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /users/signin [post]
 func (h *Handler) APISignIn(ctx *gin.Context) {
-	var j serializer.UserJSON
+	var j serializer.SignInRequest
 	if err := ctx.BindJSON(&j); err != nil {
 		h.apiError(ctx, http.StatusBadRequest, err)
 		return
@@ -51,7 +79,7 @@ func (h *Handler) APISignIn(ctx *gin.Context) {
 		h.apiError(ctx, http.StatusBadRequest, fmt.Errorf("field 'password' is required"))
 		return
 	}
-	user, err := h.Repository.SignInAPI(j)
+	_, token, err := h.Repository.SignInAPI(j)
 	if err != nil {
 		if err.Error() == "неверный логин или пароль" {
 			h.apiError(ctx, http.StatusUnauthorized, fmt.Errorf("invalid login or password"))
@@ -60,12 +88,61 @@ func (h *Handler) APISignIn(ctx *gin.Context) {
 		}
 		return
 	}
-	ctx.JSON(http.StatusOK, serializer.UserToJSON(user))
+	ctx.SetCookie("token", token, 3600, "/", "", false, true)
+	ctx.JSON(http.StatusOK, gin.H{"token": token})
 }
 
+// APISignOut godoc
+// @Summary Выход (удаление токена)
+// @Description Удаляет токен текущего пользователя из blacklist. 204 No Content.
+// @Tags users
+// @Produce json
+// @Success 204 "Токен добавлен в blacklist"
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Security ApiKeyAuth
+// @Router /users/signout [post]
 func (h *Handler) APISignOut(ctx *gin.Context) {
+	tokenString := extractTokenFromRequest(ctx)
+	if tokenString != "" {
+		if claims, err := parseToken(tokenString); err == nil {
+			if ttl, err := tokenTTLFromClaims(claims); err == nil {
+				userID := "unknown"
+				if rawUserID, ok := claims["user_id"].(string); ok && rawUserID != "" {
+					userID = rawUserID
+				}
+				_ = h.Repository.AddTokenToBlacklist(context.Background(), tokenString, ttl, userID)
+			}
+		}
+	}
 	h.Repository.SignOut()
-	ctx.JSON(http.StatusOK, gin.H{
-		"status": "signed_out",
-	})
+	ctx.SetCookie("token", "", -1, "/", "", false, true)
+	ctx.Status(http.StatusNoContent)
+}
+
+func tokenTTLFromClaims(claims jwt.MapClaims) (time.Duration, error) {
+	expVal, ok := claims["exp"]
+	if !ok {
+		return 0, errors.New("exp not present")
+	}
+	var expUnix int64
+	switch v := expVal.(type) {
+	case float64:
+		expUnix = int64(v)
+	case int64:
+		expUnix = v
+	case json.Number:
+		i, err := v.Int64()
+		if err != nil {
+			return 0, err
+		}
+		expUnix = i
+	default:
+		return 0, fmt.Errorf("unsupported exp type %T", v)
+	}
+	ttl := time.Until(time.Unix(expUnix, 0))
+	if ttl < 0 {
+		return 0, errors.New("token already expired")
+	}
+	return ttl, nil
 }

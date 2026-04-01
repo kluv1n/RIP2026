@@ -23,3 +23,6 @@ vendor/
 # Postman
 postman/
 RIP2026_Lab3_Postman_Collection.json
+
+# Local lab materials
+lab_materials/

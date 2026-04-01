@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"RIP2026/internal/app/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"RIP2026/internal/app/repository"
+	"github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func batteryLifeStatusLabel(status string) string {
@@ -173,35 +175,57 @@ func (h *Handler) DeleteBatteryLife(ctx *gin.Context) {
 	ctx.Redirect(http.StatusFound, "/")
 }
 
+// RegisterAPI godoc
+// @title Battery Life API
+// @version 1.0
+// @description API для управления заявками расчета времени работы аккумуляторов
+// @host localhost:8080
+// @BasePath /api
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 // RegisterAPI регистрирует маршруты REST API под префиксом /api
 func (h *Handler) RegisterAPI(router *gin.Engine) {
 	api := router.Group("/api")
-	batteryTypes := api.Group("/battery_types")
+
+	public := api.Group("/")
 	{
-		batteryTypes.GET("", h.APIGetBatteryTypes)
-		batteryTypes.GET("/:id", h.APIGetBatteryType)
-		batteryTypes.POST("", h.APICreateBatteryType)
+		public.GET("/battery_types", h.APIGetBatteryTypes)
+		public.GET("/battery_type/:id", h.APIGetBatteryType)
+		public.POST("/users/signup", h.APICreateUser)
+		public.POST("/users/signin", h.APISignIn)
 	}
-	batteryLives := api.Group("/battery_lives")
+
+	optional := api.Group("/")
+	optional.Use(h.OptionalAuthMiddleware())
 	{
-		batteryLives.GET("/cart", h.APIGetBatteryLifeCart)
-		batteryLives.GET("", h.APIGetBatteryLives)
-		batteryLives.GET("/:id", h.APIGetBatteryLife)
-		batteryLives.PUT("/:id", h.APIEditBatteryLife)
-		batteryLives.PUT("/:id/form", h.APIFormBatteryLife)
-		batteryLives.PUT("/:id/finish", h.APIFinishBatteryLife)
-		batteryLives.DELETE("/:id", h.APIDeleteBatteryLife)
+		optional.GET("/battery_life/battery_life-cart", h.APIGetBatteryLifeCart)
 	}
-	batteryLifeItems := api.Group("/battery_life_items")
+
+	authorized := api.Group("/")
+	authorized.Use(h.AuthMiddleware(false))
 	{
-		batteryLifeItems.POST("/add/:battery_type_id", h.APIAddToBatteryLife)
-		batteryLifeItems.DELETE("/:battery_type_id/:battery_life_id", h.APIDeleteFromBatteryLife)
-		batteryLifeItems.PUT("/:battery_type_id/:battery_life_id", h.APIEditInBatteryLife)
+		authorized.POST("/battery_type/create-battery_type", h.APICreateBatteryType)
+		authorized.GET("/battery_life/all-battery_lives", h.APIGetBatteryLives)
+		authorized.GET("/battery_life/:id", h.APIGetBatteryLife)
+		authorized.PUT("/battery_life/:id/edit-battery_life", h.APIEditBatteryLife)
+		authorized.PUT("/battery_life/:id/form-battery_life", h.APIFormBatteryLife)
+		authorized.DELETE("/battery_life/:id/delete-battery_life", h.APIDeleteBatteryLife)
+		authorized.POST("/battery_life_item/add/:battery_type_id", h.APIAddToBatteryLife)
+		authorized.DELETE("/battery_life_item/:battery_type_id/:battery_life_id", h.APIDeleteFromBatteryLife)
+		authorized.PUT("/battery_life_item/:battery_type_id/:battery_life_id", h.APIEditInBatteryLife)
+		authorized.POST("/users/signout", h.APISignOut)
 	}
-	users := api.Group("/users")
+
+	moderator := api.Group("/")
+	moderator.Use(h.AuthMiddleware(true))
 	{
-		users.POST("/register", h.APICreateUser)
-		users.POST("/login", h.APISignIn)
-		users.POST("/logout", h.APISignOut)
+		moderator.PUT("/battery_life/:id/finish-battery_life", h.APIFinishBatteryLife)
 	}
+
+	swaggerURL := ginSwagger.URL("/swagger/doc.json")
+	router.Any("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, swaggerURL))
+	router.GET("/swagger", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
+	})
 }

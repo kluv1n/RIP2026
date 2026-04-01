@@ -47,10 +47,10 @@ func (r *Repository) GetBatteryLifeDraft(creatorID uint) (models.BatteryLife, bo
 	load, err := r.CheckCurrentDraft(creatorID)
 	if err == ErrNoDraft {
 		load = models.BatteryLife{
-			Status:    models.StatusDraft,
-			CreatedAt: time.Now(),
-			CreatorID: creatorID,
-			Title:     "Расчёт времени работы",
+			Status:      models.StatusDraft,
+			CreatedAt:   time.Now(),
+			CreatorID:   creatorID,
+			Title:       "Расчёт времени работы",
 			Description: "Время (ч) = ёмкость (мА·ч) / ток (мА).",
 		}
 		if err := r.db.Create(&load).Error; err != nil {
@@ -91,6 +91,12 @@ func (r *Repository) GetCompletedItemCount(lifeID uint) (int, error) {
 func (r *Repository) GetAllBatteryLives(from, to time.Time, status string) ([]models.BatteryLife, error) {
 	var loads []models.BatteryLife
 	sub := r.db.Where("status != ? AND status != ?", models.StatusDeleted, models.StatusDraft)
+	if userID := r.GetUserID(); userID > 0 {
+		user, err := r.GetUserByID(userID)
+		if err == nil && !user.IsModerator {
+			sub = sub.Where("creator_id = ?", user.ID)
+		}
+	}
 	if !from.IsZero() {
 		sub = sub.Where("formed_at >= ?", from)
 	}
@@ -119,6 +125,12 @@ func (r *Repository) GetSingleBatteryLife(id int) (models.BatteryLife, error) {
 	if load.Status == models.StatusDeleted {
 		return models.BatteryLife{}, fmt.Errorf("%w: заявка удалена", ErrNotAllowed)
 	}
+	if userID := r.GetUserID(); userID > 0 {
+		user, err := r.GetUserByID(userID)
+		if err == nil && !user.IsModerator && load.CreatorID != user.ID {
+			return models.BatteryLife{}, fmt.Errorf("%w: доступ только к своим заявкам", ErrNotAllowed)
+		}
+	}
 	return load, nil
 }
 
@@ -143,6 +155,12 @@ func (r *Repository) EditBatteryLife(id int, j serializer.BatteryLifeJSON) (mode
 	if load.Status != models.StatusDraft {
 		return models.BatteryLife{}, fmt.Errorf("%w: можно редактировать только черновик", ErrNotAllowed)
 	}
+	if userID := r.GetUserID(); userID > 0 {
+		user, err := r.GetUserByID(userID)
+		if err == nil && !user.IsModerator && load.CreatorID != user.ID {
+			return models.BatteryLife{}, fmt.Errorf("%w: можно редактировать только свою заявку", ErrNotAllowed)
+		}
+	}
 	updates := map[string]interface{}{
 		"title":       j.Title,
 		"description": j.Description,
@@ -162,13 +180,11 @@ func (r *Repository) FormBatteryLife(id int) (models.BatteryLife, error) {
 	if load.Status != models.StatusDraft {
 		return models.BatteryLife{}, fmt.Errorf("%w: только черновик можно сформировать", ErrNotAllowed)
 	}
-	creatorID := uint(r.GetCreatorID())
-	// В лаб.3 создатель зафиксирован: если у черновика другой creator_id — подставляем фиксированного и продолжаем.
-	if load.CreatorID != creatorID {
-		if err := r.db.Model(&load).Update("creator_id", creatorID).Error; err != nil {
-			return models.BatteryLife{}, err
+	if userID := r.GetUserID(); userID > 0 {
+		user, err := r.GetUserByID(userID)
+		if err == nil && !user.IsModerator && load.CreatorID != user.ID {
+			return models.BatteryLife{}, fmt.Errorf("%w: можно сформировать только свою заявку", ErrNotAllowed)
 		}
-		load.CreatorID = creatorID
 	}
 	items, err := r.GetBatteryLifeItems(int(load.ID))
 	if err != nil {
@@ -195,8 +211,8 @@ func (r *Repository) FormBatteryLife(id int) (models.BatteryLife, error) {
 	}
 	formedAt := time.Now()
 	if err := r.db.Model(&load).Updates(map[string]interface{}{
-		"status":             models.StatusFormed,
-		"formed_at":          formedAt,
+		"status":              models.StatusFormed,
+		"formed_at":           formedAt,
 		"total_runtime_hours": totalHours,
 	}).Error; err != nil {
 		return models.BatteryLife{}, err
@@ -247,8 +263,11 @@ func (r *Repository) DeleteBatteryLifeAPI(id int) (models.BatteryLife, error) {
 	if load.Status != models.StatusDraft {
 		return models.BatteryLife{}, fmt.Errorf("%w: удалить можно только черновик", ErrNotAllowed)
 	}
-	if load.CreatorID != uint(r.GetCreatorID()) {
-		return models.BatteryLife{}, fmt.Errorf("%w: вы не создатель этой заявки", ErrNotAllowed)
+	if userID := r.GetUserID(); userID > 0 {
+		user, err := r.GetUserByID(userID)
+		if err == nil && !user.IsModerator && load.CreatorID != user.ID {
+			return models.BatteryLife{}, fmt.Errorf("%w: вы не создатель этой заявки", ErrNotAllowed)
+		}
 	}
 	formedAt := time.Now()
 	if err := r.db.Model(&load).Updates(map[string]interface{}{

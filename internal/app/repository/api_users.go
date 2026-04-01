@@ -3,9 +3,12 @@ package repository
 import (
 	"errors"
 	"fmt"
+	"os"
+	"time"
 
 	"RIP2026/internal/app/models"
 	"RIP2026/internal/app/serializer"
+	"github.com/golang-jwt/jwt"
 	"gorm.io/gorm"
 )
 
@@ -36,8 +39,8 @@ func (r *Repository) GetUserByLogin(login string) (models.User, error) {
 	return user, nil
 }
 
-func (r *Repository) CreateUserAPI(j serializer.UserJSON) (models.User, error) {
-	user := serializer.UserFromJSON(j)
+func (r *Repository) CreateUserAPI(j serializer.SignUpRequest) (models.User, error) {
+	user := serializer.SignUpRequestToUser(j)
 	if user.Login == "" {
 		return models.User{}, errors.New("логин обязателен для заполнения")
 	}
@@ -57,23 +60,42 @@ func (r *Repository) CreateUserAPI(j serializer.UserJSON) (models.User, error) {
 	return user, nil
 }
 
-func (r *Repository) SignInAPI(j serializer.UserJSON) (models.User, error) {
+func (r *Repository) SignInAPI(j serializer.SignInRequest) (models.User, string, error) {
 	if j.Login == "" {
-		return models.User{}, errors.New("логин обязателен для заполнения")
+		return models.User{}, "", errors.New("логин обязателен для заполнения")
 	}
 	if j.Password == "" {
-		return models.User{}, errors.New("пароль обязателен для заполнения")
+		return models.User{}, "", errors.New("пароль обязателен для заполнения")
 	}
 	user, err := r.GetUserByLogin(j.Login)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
-			return models.User{}, errors.New("неверный логин или пароль")
+			return models.User{}, "", errors.New("неверный логин или пароль")
 		}
-		return models.User{}, err
+		return models.User{}, "", err
 	}
 	if user.Password != j.Password {
-		return models.User{}, errors.New("неверный логин или пароль")
+		return models.User{}, "", errors.New("неверный логин или пароль")
 	}
 	r.SetUserID(int(user.ID))
-	return user, nil
+	token, err := GenerateToken(user.ID, user.IsModerator)
+	if err != nil {
+		return models.User{}, "", err
+	}
+	return user, token, nil
+}
+
+func GenerateToken(userID uint, isModerator bool) (string, error) {
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["authorized"] = true
+	claims["user_id"] = fmt.Sprintf("%d", userID)
+	claims["is_moderator"] = isModerator
+	claims["exp"] = time.Now().Add(time.Hour).Unix()
+
+	jwtKey := os.Getenv("JWT_KEY")
+	if jwtKey == "" {
+		jwtKey = "default-secret-key-change-in-production"
+	}
+	return token.SignedString([]byte(jwtKey))
 }

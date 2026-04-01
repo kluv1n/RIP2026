@@ -60,6 +60,12 @@ func (r *Repository) DeleteFromBatteryLife(lifeID, batteryTypeID int) (models.Ba
 	if load.Status != models.StatusDraft {
 		return models.BatteryLife{}, fmt.Errorf("%w: можно удалять только из черновика", ErrNotAllowed)
 	}
+	if userID := r.GetUserID(); userID > 0 {
+		user, err := r.GetUserByID(userID)
+		if err == nil && !user.IsModerator && load.CreatorID != user.ID {
+			return models.BatteryLife{}, fmt.Errorf("%w: можно удалять только из своей заявки", ErrNotAllowed)
+		}
+	}
 	if err := r.db.Where("battery_life_id = ? AND battery_type_id = ?", lifeID, batteryTypeID).
 		Delete(&models.BatteryLifeItem{}).Error; err != nil {
 		return models.BatteryLife{}, err
@@ -82,6 +88,12 @@ func (r *Repository) EditInBatteryLife(lifeID, batteryTypeID int, j serializer.B
 	}
 	if load.Status != models.StatusDraft {
 		return models.BatteryLifeItem{}, fmt.Errorf("%w: можно редактировать только черновик", ErrNotAllowed)
+	}
+	if userID := r.GetUserID(); userID > 0 {
+		user, err := r.GetUserByID(userID)
+		if err == nil && !user.IsModerator && load.CreatorID != user.ID {
+			return models.BatteryLifeItem{}, fmt.Errorf("%w: можно редактировать только свою заявку", ErrNotAllowed)
+		}
 	}
 	updates := map[string]interface{}{
 		"quantity":   j.Quantity,

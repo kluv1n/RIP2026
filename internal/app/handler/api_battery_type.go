@@ -7,11 +7,20 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	"RIP2026/internal/app/repository"
 	"RIP2026/internal/app/serializer"
+	"github.com/gin-gonic/gin"
 )
 
+// APIGetBatteryTypes godoc
+// @Summary Получить список аккумуляторов
+// @Description Возвращает все аккумуляторы или фильтрует по названию.
+// @Tags battery_types
+// @Produce json
+// @Param title query string false "Название аккумулятора для поиска"
+// @Success 200 {array} serializer.BatteryTypeJSON
+// @Failure 500 {object} map[string]string
+// @Router /battery_types [get]
 func (h *Handler) APIGetBatteryTypes(ctx *gin.Context) {
 	title := ctx.Query("title")
 	if title == "" {
@@ -39,6 +48,17 @@ func (h *Handler) APIGetBatteryTypes(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
+// APIGetBatteryType godoc
+// @Summary Получить аккумулятор по ID
+// @Description Возвращает данные одного аккумулятора.
+// @Tags battery_types
+// @Produce json
+// @Param id path int true "ID аккумулятора"
+// @Success 200 {object} serializer.BatteryTypeJSON
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /battery_type/{id} [get]
 func (h *Handler) APIGetBatteryType(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -58,6 +78,19 @@ func (h *Handler) APIGetBatteryType(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, serializer.BatteryTypeToJSON(*bt))
 }
 
+// APICreateBatteryType godoc
+// @Summary Создать аккумулятор
+// @Description Создает новый тип аккумулятора. Доступно авторизованному пользователю.
+// @Tags battery_types
+// @Accept json
+// @Produce json
+// @Param battery_type body serializer.BatteryTypeJSON true "Данные аккумулятора"
+// @Success 201 {object} serializer.BatteryTypeJSON
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Security ApiKeyAuth
+// @Router /battery_type/create-battery_type [post]
 func (h *Handler) APICreateBatteryType(ctx *gin.Context) {
 	contentType := ctx.GetHeader("Content-Type")
 	var j serializer.BatteryTypeJSON
