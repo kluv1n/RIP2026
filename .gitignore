@@ -16,3 +16,12 @@ vendor/
 # Archives (installers etc.)
 *.tar.gz
 *.zip
+
+# Локальные материалы других лаб / Postman (не коммитить в ветку лабы 1)
+lab_materials/
+postman/
+RIP2026_Lab*_Postman*.json
+
+# Секреты и мусор Office
+.env
+~$*.docx

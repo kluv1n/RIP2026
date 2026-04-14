@@ -1,4 +1,0 @@
-$kind: http-request
-url: "{{baseUrl}}/api/battery_lives/{{battery_life_id}}/form"
-method: PUT
-order: 7000

@@ -1,9 +1,0 @@
-$kind: http-request
-url: "{{baseUrl}}/api/battery_lives?from-date=2025-01-01&to-date=2026-12-31&sta\
-  tus=formed"
-method: GET
-queryParams:
-  from-date: 2025-01-01
-  to-date: 2026-12-31
-  status: formed
-order: 5000

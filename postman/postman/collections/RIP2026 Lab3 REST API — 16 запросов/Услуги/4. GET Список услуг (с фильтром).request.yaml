@@ -1,6 +1,0 @@
-$kind: http-request
-url: "{{baseUrl}}/api/battery_types?title=литий"
-method: GET
-queryParams:
-  title: литий
-order: 1000

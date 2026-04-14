@@ -1,4 +1,0 @@
-$kind: http-request
-url: "{{baseUrl}}/api/battery_lives/{{battery_life_id}}"
-method: DELETE
-order: 2000
