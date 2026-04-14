@@ -18,7 +18,7 @@ import (
 // @Tags battery_types
 // @Produce json
 // @Param title query string false "Название аккумулятора для поиска"
-// @Success 200 {array} serializer.BatteryTypeJSON
+// @Success 200 {object} serializer.BatteryTypeListJSON
 // @Failure 500 {object} map[string]string
 // @Router /battery_types [get]
 func (h *Handler) APIGetBatteryTypes(ctx *gin.Context) {
@@ -29,11 +29,7 @@ func (h *Handler) APIGetBatteryTypes(ctx *gin.Context) {
 			h.apiError(ctx, http.StatusInternalServerError, err)
 			return
 		}
-		resp := make([]serializer.BatteryTypeJSON, 0, len(types))
-		for _, t := range types {
-			resp = append(resp, serializer.BatteryTypeToJSON(t))
-		}
-		ctx.JSON(http.StatusOK, resp)
+		ctx.JSON(http.StatusOK, serializer.BatteryTypesToListJSON(types))
 		return
 	}
 	types, err := h.Repository.GetBatteryTypesByTitleAPI(title)
@@ -41,11 +37,7 @@ func (h *Handler) APIGetBatteryTypes(ctx *gin.Context) {
 		h.apiError(ctx, http.StatusInternalServerError, err)
 		return
 	}
-	resp := make([]serializer.BatteryTypeJSON, 0, len(types))
-	for _, t := range types {
-		resp = append(resp, serializer.BatteryTypeToJSON(t))
-	}
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, serializer.BatteryTypesToListJSON(types))
 }
 
 // APIGetBatteryType godoc
