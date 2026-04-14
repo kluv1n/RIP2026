@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/api/battery_lives/{{battery_life_id}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "title": "Подборка товаров для ролика",
+      "description": "Нагрузочный тест заявки"
+    }
+order: 5000

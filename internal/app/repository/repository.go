@@ -17,6 +17,7 @@ type BatteryType struct {
 	Title            string
 	CapacityMah      int     // ёмкость, мА·ч
 	VoltageV         float64 // напряжение, В
+	DemoLoadMa       int     // типовой ток нагрузки для блока «Ток / время» на карточке услуги, мА
 	Photo            string
 	Video            string
 	ShortDescription string
@@ -50,9 +51,10 @@ func (r *Repository) GetBatteryTypes() ([]BatteryType, error) {
 			Title:            "Li-ion (литий-ионный)",
 			CapacityMah:      3000,
 			VoltageV:         3.7,
+			DemoLoadMa:       500, // ~6 ч при 3000 мА·ч (оценка: ч = мА·ч / мА)
 			Photo:            "li_ion.jpg",
 			Video:            "li_ion.mp4",
-			ShortDescription: "Высокая удельная энергия, малый саморазряд",
+			ShortDescription: "Высокая энергия, малый саморазряд.",
 			Description:      "Литий-ионные аккумуляторы широко применяются в смартфонах, ноутбуках, электротранспорте. Характеризуются высокой плотностью энергии, отсутствием эффекта памяти. Номинальное напряжение одной ячейки обычно 3,6–3,7 В.",
 		},
 		{
@@ -60,9 +62,10 @@ func (r *Repository) GetBatteryTypes() ([]BatteryType, error) {
 			Title:            "Li-Po (литий-полимерный)",
 			CapacityMah:      1500,
 			VoltageV:         3.7,
+			DemoLoadMa:       250,
 			Photo:            "li_po.jpg",
 			Video:            "li_po.mp4",
-			ShortDescription: "Гибкая форма, малый вес, высокая токоотдача",
+			ShortDescription: "Лёгкий, гибкий, высокий ток.",
 			Description:      "Литий-полимерные аккумуляторы позволяют делать батареи тонкими и гибкими. Часто применяются в дронах, носимой электронике. По удельной энергии и напряжению близки к Li-ion.",
 		},
 		{
@@ -70,9 +73,10 @@ func (r *Repository) GetBatteryTypes() ([]BatteryType, error) {
 			Title:            "Ni-MH (никель-металлгидридный)",
 			CapacityMah:      2500,
 			VoltageV:         1.2,
+			DemoLoadMa:       200,
 			Photo:            "ni_mh.jpg",
 			Video:            "ni_mh.mp4",
-			ShortDescription: "Экологичность, перезаряжаемость, стабильность при низких температурах",
+			ShortDescription: "Без кадмия, стабилен в холоде.",
 			Description:      "Никель-металлгидридные аккумуляторы — перезаряжаемая альтернатива без кадмия. Номинальное напряжение элемента 1,2 В. Используются в бытовой технике, гибридном транспорте.",
 		},
 	}

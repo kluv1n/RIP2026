@@ -1,6 +1,6 @@
 <html lang="ru">
     <head>
-        <title>{{ .battery.Title }} — Battery life подробности</title>
+        <title>{{ .battery.Title }} — подробности услуги</title>
         <link rel="stylesheet" href="/static/styles/index_style.css?v=neter">
     </head>
     <header class="header-center">
@@ -8,28 +8,49 @@
             <img src="/static/img/logo.svg?v=neter" alt="НЭТЕР" class="header-logo__img">
         </a>
     </header>
-    <div class="detail-wrapper">
+    <div class="detail-wrapper detail-wrapper--battery">
         <a href="/" class="back-link">← Вернуться к списку типов аккумуляторов</a>
-        <div class="detail-card">
-            <video class="detail-card__video" controls autoplay muted loop>
-                <source src="http://localhost:9000/test/{{ .battery.Video }}" type="video/mp4">
-            </video>
-            <div class="detail-card__body">
-                <h1 class="detail-card__title">{{ .battery.Title }}</h1>
-                <p class="detail-card__employees">Ёмкость и напряжение: {{ .battery.CapacityMah }} мА·ч, {{ .battery.VoltageV }} В</p>
-                <p class="detail-card__description">{{ .battery.Description }}</p>
-                {{ if .hasInBatteryLife }}
-                <hr class="detail-card__separator">
-                <h2 class="detail-card__section-title">Battery life для этого аккумулятора</h2>
-                <div class="manager-block">
-                    <div class="manager-block__name">Потребляемый ток: {{ .batteryLifeItem.CurrentMa }} мА</div>
-                    <div class="manager-block__meta">
-                        <span><strong>Время работы:</strong> {{ printf "%.2f" .batteryLifeItem.RuntimeHours }} ч</span>
-                        <span><strong>Количество:</strong> {{ .batteryLifeItem.Mm }}</span>
+        <div class="detail-card detail-card--split">
+            <div class="detail-card__media">
+                <div class="detail-card__video-frame detail-card__video-frame--desc" tabindex="0" role="region" aria-label="Видео и описание по наведению">
+                    <video class="detail-card__video" controls autoplay muted loop playsinline>
+                        <source src="http://localhost:9000/test/{{ .battery.Video }}" type="video/mp4">
+                    </video>
+                    <div class="detail-video-desc">
+                        <div class="detail-video-desc__rail">
+                            <div class="detail-video-desc__rail-panel">
+                                <div class="detail-stat detail-stat--rail">
+                                <svg class="detail-stat__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <rect x="6" y="7" width="12" height="10" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M10 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                                <span class="detail-stat__value">{{ .battery.CapacityMah }}</span>
+                                <span class="detail-stat__unit">мА·ч</span>
+                                </div>
+                                <div class="detail-stat detail-stat--rail">
+                                <svg class="detail-stat__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M13 2L4 14h7l-1 8 10-12h-7l0-8z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                </svg>
+                                <span class="detail-stat__value">{{ printf "%.1f" .battery.VoltageV }}</span>
+                                <span class="detail-stat__unit">В</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="detail-video-desc__bottom">
+                            <h1 class="detail-video-desc__title">{{ .battery.Title }}</h1>
+                            <p class="detail-video-desc__short">{{ .battery.ShortDescription }}</p>
+                            <div class="detail-video-desc__metrics-text">
+                                <p class="detail-video-desc__metric-row"><strong>Ток:</strong> {{ .currentAStr }} А</p>
+                                <p class="detail-video-desc__metric-row"><strong>Время работы:</strong> {{ .runtimeHoursStr }} ч</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                {{ end }}
             </div>
+            <aside class="detail-card__actions">
+                <a href="/battery-life/1" class="cart-button cart-button--block">Добавить в заявку</a>
+            </aside>
         </div>
     </div>
 </html>

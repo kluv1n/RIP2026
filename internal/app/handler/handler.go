@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -56,13 +57,20 @@ func (h *Handler) GetBattery(ctx *gin.Context) {
 		logrus.Error(err)
 	}
 
-	batteryLifeItem, err := h.Repository.GetBatteryLifeForBattery(id)
-	hasInBatteryLife := err == nil && batteryLifeItem != nil
+	loadMa := battery.DemoLoadMa
+	if loadMa <= 0 {
+		loadMa = 100
+	}
+	hours := repository.RuntimeHours(battery.CapacityMah, loadMa)
+	currentA := float64(loadMa) / 1000.0
+	currentAStr := strings.Replace(fmt.Sprintf("%.2f", currentA), ".", ",", 1)
+	runtimeHoursStr := strings.Replace(fmt.Sprintf("%.1f", hours), ".", ",", 1)
 
 	ctx.HTML(http.StatusOK, "battery.html", gin.H{
 		"battery":          battery,
-		"batteryLifeItem":  batteryLifeItem,
-		"hasInBatteryLife": hasInBatteryLife,
+		"batteryID":        id,
+		"currentAStr":      currentAStr,
+		"runtimeHoursStr":  runtimeHoursStr,
 	})
 }
 

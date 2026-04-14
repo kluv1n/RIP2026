@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/api/battery_life_items/add/2"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "current_ma": 150,
+      "quantity": 1
+    }
+order: 2000

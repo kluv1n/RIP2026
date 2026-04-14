@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/api/battery_lives/{{battery_life_id}}"
+method: GET
+order: 4000
