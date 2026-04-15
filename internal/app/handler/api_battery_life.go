@@ -14,7 +14,7 @@ import (
 // APIGetBatteryLifeCart godoc
 // @Summary Получить корзину заявки
 // @Description Возвращает информацию о текущем черновике пользователя или статус `no_draft`.
-// @Tags battery_lives
+// @Tags battery life
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Router /battery_life/battery_life-cart [get]
@@ -57,7 +57,7 @@ func (h *Handler) APIGetBatteryLifeCart(ctx *gin.Context) {
 // APIGetBatteryLives godoc
 // @Summary Получить список заявок
 // @Description Возвращает заявки пользователя, а для модератора - все заявки. Поддерживает фильтрацию по датам и статусу.
-// @Tags battery_lives
+// @Tags battery life
 // @Produce json
 // @Param from-date query string false "Начальная дата (YYYY-MM-DD)"
 // @Param to-date query string false "Конечная дата (YYYY-MM-DD)"
@@ -67,7 +67,7 @@ func (h *Handler) APIGetBatteryLifeCart(ctx *gin.Context) {
 // @Failure 401 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Security ApiKeyAuth
-// @Router /battery_life/all-battery_lives [get]
+// @Router /battery_life/all-battery_life [get]
 func (h *Handler) APIGetBatteryLives(ctx *gin.Context) {
 	userID, err := currentUserID(ctx)
 	if err != nil {
@@ -119,7 +119,7 @@ func (h *Handler) APIGetBatteryLives(ctx *gin.Context) {
 // APIGetBatteryLife godoc
 // @Summary Получить заявку по ID
 // @Description Возвращает полную информацию о заявке и ее позициях.
-// @Tags battery_lives
+// @Tags battery life
 // @Produce json
 // @Param id path int true "ID заявки"
 // @Success 200 {object} map[string]interface{}
@@ -175,7 +175,7 @@ func (h *Handler) APIGetBatteryLife(ctx *gin.Context) {
 // APIEditBatteryLife godoc
 // @Summary Изменить заявку
 // @Description Обновляет данные черновика заявки.
-// @Tags battery_lives
+// @Tags battery life
 // @Accept json
 // @Produce json
 // @Param id path int true "ID заявки"
@@ -226,7 +226,7 @@ func (h *Handler) APIEditBatteryLife(ctx *gin.Context) {
 // APIFormBatteryLife godoc
 // @Summary Сформировать заявку
 // @Description Переводит черновик в статус `formed`.
-// @Tags battery_lives
+// @Tags battery life
 // @Produce json
 // @Param id path int true "ID заявки"
 // @Success 200 {object} serializer.BatteryLifeJSON
@@ -269,7 +269,7 @@ func (h *Handler) APIFormBatteryLife(ctx *gin.Context) {
 // APIFinishBatteryLife godoc
 // @Summary Завершить заявку
 // @Description Изменяет статус заявки на `completed` или `rejected`. Доступно только модератору.
-// @Tags battery_lives
+// @Tags battery life
 // @Accept json
 // @Produce json
 // @Param id path int true "ID заявки"
@@ -319,7 +319,7 @@ func (h *Handler) APIFinishBatteryLife(ctx *gin.Context) {
 // APIDeleteBatteryLife godoc
 // @Summary Удалить заявку
 // @Description Выполняет логическое удаление черновика заявки.
-// @Tags battery_lives
+// @Tags battery life
 // @Produce json
 // @Param id path int true "ID заявки"
 // @Success 200 {object} map[string]string

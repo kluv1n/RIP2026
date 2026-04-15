@@ -1,6 +1,6 @@
 <html lang="ru">
     <head>
-        <title>Подборка № {{ .batteryLife.ID }} — время работы набора</title>
+        <title>battery life — заявка № {{ .batteryLife.ID }}</title>
         <link rel="stylesheet" href="/static/styles/index_style.css?v=neter8">
     </head>
     <header class="header-center">
@@ -24,7 +24,7 @@
             {{ if .isDraft }}
             <form action="/battery-life/delete" method="POST" style="margin-top:16px;">
                 <input type="hidden" name="battery_life_id" value="{{ .batteryLife.ID }}">
-                <button type="submit" class="cart-button" style="background-color: var(--neter-text-muted);">Удалить подборку</button>
+                <button type="submit" class="cart-button" style="background-color: var(--neter-text-muted);">Удалить заявку</button>
             </form>
             {{ end }}
         </div>

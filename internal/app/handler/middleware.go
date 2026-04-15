@@ -64,6 +64,17 @@ func userIDFromClaims(claims jwt.MapClaims) (uint, error) {
 	return uint(userID), nil
 }
 
+// moderatorFromClaims: приоритет role; fallback на is_moderator для старых JWT.
+func moderatorFromClaims(claims jwt.MapClaims) bool {
+	if role, ok := claims["role"].(string); ok {
+		return role == "moderator"
+	}
+	if b, ok := claims["is_moderator"].(bool); ok {
+		return b
+	}
+	return false
+}
+
 func (h *Handler) OptionalAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := extractTokenFromRequest(c)
@@ -90,7 +101,7 @@ func (h *Handler) OptionalAuthMiddleware() gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		isModerator, _ := claims["is_moderator"].(bool)
+		isModerator := moderatorFromClaims(claims)
 		c.Set("user_id", userID)
 		c.Set("is_moderator", isModerator)
 		c.Next()
@@ -123,7 +134,7 @@ func (h *Handler) AuthMiddleware(requireModerator bool) gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		isModerator, _ := claims["is_moderator"].(bool)
+		isModerator := moderatorFromClaims(claims)
 		if requireModerator && !isModerator {
 			c.AbortWithStatus(http.StatusForbidden)
 			return

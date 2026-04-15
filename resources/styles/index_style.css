@@ -451,6 +451,40 @@ a.battery-life-card:hover .battery-life-card__info {
     padding: 0 20px;
 }
 
+.detail-wrapper--battery {
+    max-width: 1200px;
+}
+
+/* Страница карточки: видео слева, количество и «в заявку» справа; вся карточка по центру страницы */
+.detail-wrapper--battery .detail-card.detail-card--split {
+    display: grid;
+    grid-template-columns: minmax(280px, 400px) minmax(220px, 320px);
+    justify-content: center;
+    align-items: stretch;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
+.detail-wrapper--battery .detail-card__media {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 28px 4px 28px 24px;
+    box-sizing: border-box;
+}
+
+/* Без линии и лишнего зазора между видео и блоком справа */
+.detail-wrapper--battery .detail-card__actions {
+    border-left: none;
+    border-top: none;
+    padding: 18px 24px 28px 4px;
+    justify-content: flex-start;
+    max-width: none;
+    width: auto;
+}
+
 .detail-card {
     background-color: var(--neter-card-bg);
     border-radius: 16px;
@@ -462,12 +496,23 @@ a.battery-life-card:hover .battery-life-card__info {
     gap: 0;
 }
 
+.detail-card--split {
+    grid-template-columns: minmax(300px, 440px) minmax(240px, 1fr);
+    align-items: stretch;
+}
+
 .detail-card__media {
     background-color: var(--neter-card-bg);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 32px 28px;
+}
+
+.detail-card--split .detail-card__media {
+    justify-content: center;
+    padding-left: 24px;
+    padding-right: 24px;
 }
 
 .detail-card__video-frame {
@@ -492,54 +537,153 @@ a.battery-life-card:hover .battery-life-card__info {
     cursor: default;
 }
 
-/* Страница товара: полное описание на видео, целиком (прокрутка при длинном тексте) */
+/* Оверлей: блок параметров по вертикали по центру кадра, снизу текст. Цвет текста — белый (перебивает * { color } в :root). */
 .detail-video-desc {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    max-height: 58%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 16px 14px 14px;
+    inset: 0;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    align-items: stretch;
+    padding: 14px 12px 16px;
+    box-sizing: border-box;
     background: linear-gradient(
-        to top,
-        rgba(0, 0, 0, 0.82) 0%,
-        rgba(0, 0, 0, 0.5) 50%,
-        transparent 100%
+        180deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.15) 35%,
+        rgba(0, 0, 0, 0.55) 100%
     );
-    transform: translateY(100%);
-    transition: transform 0.35s cubic-bezier(0.33, 1, 0.68, 1);
+    opacity: 0;
+    transition: opacity 0.35s ease;
     pointer-events: none;
-}
-
-.detail-video-desc__text {
-    margin: 0;
-    font-size: 0.9rem;
-    line-height: 1.5;
     color: #ffffff;
-    font-weight: 400;
 }
 
-@media (hover: hover) and (pointer: fine) {
-    .detail-card__video-frame--desc:hover .detail-video-desc {
-        transform: translateY(0);
-        pointer-events: auto;
-    }
+.detail-video-desc,
+.detail-video-desc * {
+    color: #ffffff;
+}
+
+.detail-card__video-frame--desc:hover .detail-video-desc,
+.detail-card__video-frame--desc:focus-within .detail-video-desc {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.detail-video-desc__rail {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    min-height: 0;
+}
+
+.detail-video-desc__rail-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: transparent;
+}
+
+.detail-stat--rail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: #ffffff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+}
+
+.detail-stat--rail .detail-stat__icon {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 2px;
+}
+
+.detail-stat--rail .detail-stat__value {
+    font-weight: 700;
+    font-size: 1.05rem;
+    line-height: 1.2;
+}
+
+.detail-stat--rail .detail-stat__unit {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    opacity: 0.95;
+}
+
+.detail-video-desc__bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.35);
+    padding-top: 12px;
+    color: #ffffff;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+}
+
+.detail-video-desc__title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+    line-height: 1.25;
+    color: #ffffff;
+}
+
+.detail-video-desc__short {
+    font-size: 0.82rem;
+    margin: 0 0 10px;
+    line-height: 1.45;
+    opacity: 0.96;
+    color: #ffffff;
+}
+
+.detail-video-desc__metrics-text {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.detail-video-desc__metric-row {
+    margin: 4px 0 0;
+}
+
+.detail-video-desc__metric-row:first-of-type {
+    margin-top: 0;
+}
+
+.detail-card__actions {
+    padding: 18px 32px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    background-color: var(--neter-card-bg);
+    border-left: 1px solid var(--neter-border);
+}
+
+.add-to-cart-form--aside {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    max-width: 320px;
+}
+
+.cart-button--block {
+    width: 100%;
+    justify-content: center;
 }
 
 @media (hover: none), (pointer: coarse) {
     .detail-card__video-frame--desc .detail-video-desc {
-        transform: translateY(0);
+        opacity: 1;
         pointer-events: auto;
-        padding-top: 24px;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .detail-card__video-frame--desc .detail-video-desc {
-        transform: translateY(0);
+    .detail-video-desc {
+        opacity: 1;
         pointer-events: auto;
         transition: none;
     }
@@ -991,14 +1135,37 @@ a.battery-life-card:hover .battery-life-card__info {
     .detail-wrapper {
         padding: 0 10px;
     }
-    .detail-card {
+    .detail-card,
+    .detail-card--split {
         grid-template-columns: 1fr;
     }
     .detail-card__media {
         padding: 20px 16px;
     }
+    .detail-card--split .detail-card__media {
+        justify-content: center;
+        padding-right: 16px;
+    }
     .detail-card__body {
         padding: 20px;
+    }
+    .detail-card__actions {
+        border-left: none;
+        border-top: 1px solid var(--neter-border);
+        padding: 16px 20px 20px;
+    }
+    .detail-wrapper--battery .detail-card.detail-card--split {
+        grid-template-columns: 1fr;
+        max-width: none;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .detail-wrapper--battery .detail-card__actions {
+        border-left: none;
+        border-top: 1px solid var(--neter-border);
+    }
+    .add-to-cart-form--aside {
+        max-width: none;
     }
     header, .header-center {
         padding: 0 16px;

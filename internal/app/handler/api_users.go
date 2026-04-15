@@ -16,8 +16,8 @@ import (
 
 // APICreateUser godoc
 // @Summary Регистрация пользователя
-// @Description Регистрирует нового пользователя. Возвращает login и is_moderator.
-// @Tags users
+// @Description Регистрирует нового пользователя. Возвращает login и role (moderator|creator).
+// @Tags battery life
 // @Accept json
 // @Produce json
 // @Param user body serializer.SignUpRequest true "Логин и пароль"
@@ -55,12 +55,12 @@ func (h *Handler) APICreateUser(ctx *gin.Context) {
 
 // APISignIn godoc
 // @Summary Вход (получение токена)
-// @Description Принимает логин/пароль, возвращает jwt-токен в формате {"token":"..."}.
-// @Tags users
+// @Description Принимает логин/пароль, возвращает token и role (moderator|creator).
+// @Tags battery life
 // @Accept json
 // @Produce json
 // @Param credentials body serializer.SignInRequest true "Логин и пароль"
-// @Success 200 {object} map[string]string "token"
+// @Success 200 {object} serializer.SignInResponse
 // @Failure 400 {object} map[string]string
 // @Failure 401 {object} map[string]string
 // @Failure 500 {object} map[string]string
@@ -79,7 +79,7 @@ func (h *Handler) APISignIn(ctx *gin.Context) {
 		h.apiError(ctx, http.StatusBadRequest, fmt.Errorf("field 'password' is required"))
 		return
 	}
-	_, token, err := h.Repository.SignInAPI(j)
+	user, token, err := h.Repository.SignInAPI(j)
 	if err != nil {
 		if err.Error() == "неверный логин или пароль" {
 			h.apiError(ctx, http.StatusUnauthorized, fmt.Errorf("invalid login or password"))
@@ -89,13 +89,16 @@ func (h *Handler) APISignIn(ctx *gin.Context) {
 		return
 	}
 	ctx.SetCookie("token", token, 3600, "/", "", false, true)
-	ctx.JSON(http.StatusOK, gin.H{"token": token})
+	ctx.JSON(http.StatusOK, serializer.SignInResponse{
+		Token: token,
+		Role:  serializer.UserRole(user.IsModerator),
+	})
 }
 
 // APISignOut godoc
 // @Summary Выход (удаление токена)
 // @Description Удаляет токен текущего пользователя из blacklist. 204 No Content.
-// @Tags users
+// @Tags battery life
 // @Produce json
 // @Success 204 "Токен добавлен в blacklist"
 // @Failure 400 {object} map[string]string
@@ -107,11 +110,7 @@ func (h *Handler) APISignOut(ctx *gin.Context) {
 	if tokenString != "" {
 		if claims, err := parseToken(tokenString); err == nil {
 			if ttl, err := tokenTTLFromClaims(claims); err == nil {
-				userID := "unknown"
-				if rawUserID, ok := claims["user_id"].(string); ok && rawUserID != "" {
-					userID = rawUserID
-				}
-				_ = h.Repository.AddTokenToBlacklist(context.Background(), tokenString, ttl, userID)
+				_ = h.Repository.AddTokenToBlacklist(context.Background(), tokenString, ttl)
 			}
 		}
 	}

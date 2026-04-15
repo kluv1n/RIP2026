@@ -14,10 +14,10 @@ import (
 // APIAddToBatteryLife godoc
 // @Summary Добавить аккумулятор в заявку
 // @Description Добавляет аккумулятор в черновик пользователя. При отсутствии черновика он создается.
-// @Tags battery_life_items
+// @Tags battery life
 // @Accept json
 // @Produce json
-// @Param battery_type_id path int true "ID аккумулятора"
+// @Param battery_life_type_id path int true "ID типа аккумулятора"
 // @Param item body serializer.BatteryLifeItemJSON false "Параметры позиции"
 // @Success 200 {object} serializer.BatteryLifeJSON
 // @Success 201 {object} serializer.BatteryLifeJSON
@@ -27,7 +27,7 @@ import (
 // @Failure 409 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Security ApiKeyAuth
-// @Router /battery_life_item/add/{battery_type_id} [post]
+// @Router /battery_life_item/add/{battery_life_type_id} [post]
 func (h *Handler) APIAddToBatteryLife(ctx *gin.Context) {
 	creatorID, err := currentUserID(ctx)
 	if err != nil {
@@ -36,7 +36,7 @@ func (h *Handler) APIAddToBatteryLife(ctx *gin.Context) {
 	}
 	h.Repository.SetUserID(int(creatorID))
 
-	batteryTypeIDStr := ctx.Param("battery_type_id")
+	batteryTypeIDStr := ctx.Param("battery_life_type_id")
 	batteryTypeID, err := strconv.Atoi(batteryTypeIDStr)
 	if err != nil {
 		h.apiError(ctx, http.StatusBadRequest, err)
@@ -79,7 +79,7 @@ func (h *Handler) APIAddToBatteryLife(ctx *gin.Context) {
 	completedCount, _ := h.Repository.GetCompletedItemCount(load.ID)
 	status := http.StatusOK
 	if created {
-		ctx.Header("Location", fmt.Sprintf("/api/battery_lives/%d", load.ID))
+		ctx.Header("Location", fmt.Sprintf("/api/battery_life/%d", load.ID))
 		status = http.StatusCreated
 	}
 	ctx.JSON(status, serializer.BatteryLifeToJSON(load, creatorLogin, moderatorLogin, completedCount))
@@ -88,9 +88,9 @@ func (h *Handler) APIAddToBatteryLife(ctx *gin.Context) {
 // APIDeleteFromBatteryLife godoc
 // @Summary Удалить аккумулятор из заявки
 // @Description Удаляет позицию из черновика заявки.
-// @Tags battery_life_items
+// @Tags battery life
 // @Produce json
-// @Param battery_type_id path int true "ID аккумулятора"
+// @Param battery_life_type_id path int true "ID типа аккумулятора"
 // @Param battery_life_id path int true "ID заявки"
 // @Success 200 {object} serializer.BatteryLifeJSON
 // @Failure 400 {object} map[string]string
@@ -99,7 +99,7 @@ func (h *Handler) APIAddToBatteryLife(ctx *gin.Context) {
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Security ApiKeyAuth
-// @Router /battery_life_item/{battery_type_id}/{battery_life_id} [delete]
+// @Router /battery_life_item/{battery_life_type_id}/{battery_life_id} [delete]
 func (h *Handler) APIDeleteFromBatteryLife(ctx *gin.Context) {
 	userID, err := currentUserID(ctx)
 	if err != nil {
@@ -108,7 +108,7 @@ func (h *Handler) APIDeleteFromBatteryLife(ctx *gin.Context) {
 	}
 	h.Repository.SetUserID(int(userID))
 
-	batteryTypeID, err := strconv.Atoi(ctx.Param("battery_type_id"))
+	batteryTypeID, err := strconv.Atoi(ctx.Param("battery_life_type_id"))
 	if err != nil {
 		h.apiError(ctx, http.StatusBadRequest, err)
 		return
@@ -137,10 +137,10 @@ func (h *Handler) APIDeleteFromBatteryLife(ctx *gin.Context) {
 // APIEditInBatteryLife godoc
 // @Summary Изменить позицию в заявке
 // @Description Обновляет ток и количество для позиции в черновике заявки.
-// @Tags battery_life_items
+// @Tags battery life
 // @Accept json
 // @Produce json
-// @Param battery_type_id path int true "ID аккумулятора"
+// @Param battery_life_type_id path int true "ID типа аккумулятора"
 // @Param battery_life_id path int true "ID заявки"
 // @Param item body serializer.BatteryLifeItemJSON true "Новые данные позиции"
 // @Success 200 {object} serializer.BatteryLifeItemJSON
@@ -150,7 +150,7 @@ func (h *Handler) APIDeleteFromBatteryLife(ctx *gin.Context) {
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Security ApiKeyAuth
-// @Router /battery_life_item/{battery_type_id}/{battery_life_id} [put]
+// @Router /battery_life_item/{battery_life_type_id}/{battery_life_id} [put]
 func (h *Handler) APIEditInBatteryLife(ctx *gin.Context) {
 	userID, err := currentUserID(ctx)
 	if err != nil {
@@ -159,7 +159,7 @@ func (h *Handler) APIEditInBatteryLife(ctx *gin.Context) {
 	}
 	h.Repository.SetUserID(int(userID))
 
-	batteryTypeID, err := strconv.Atoi(ctx.Param("battery_type_id"))
+	batteryTypeID, err := strconv.Atoi(ctx.Param("battery_life_type_id"))
 	if err != nil {
 		h.apiError(ctx, http.StatusBadRequest, err)
 		return

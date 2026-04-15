@@ -86,12 +86,12 @@ func blacklistKeyForToken(tokenString string) string {
 	return "blacklist:" + hex.EncodeToString(h[:])
 }
 
-func (r *Repository) AddTokenToBlacklist(ctx context.Context, tokenString string, ttl time.Duration, userID string) error {
+func (r *Repository) AddTokenToBlacklist(ctx context.Context, tokenString string, ttl time.Duration) error {
 	if ttl <= 0 || r.rd == nil {
 		return nil
 	}
 	key := blacklistKeyForToken(tokenString)
-	value := "user_id:" + userID
+	const value = "revoked"
 	return r.rd.Set(key, value, ttl).Err()
 }
 

@@ -1,36 +1,95 @@
 <html lang="ru">
     <head>
-        <title>{{ .battery.Title }} — подборка товара для шорта</title>
-        <link rel="stylesheet" href="/static/styles/index_style.css?v=neter8">
+        <title>{{ .battery.Title }} — battery life</title>
+        <link rel="stylesheet" href="/static/styles/index_style.css?v=neter14">
     </head>
-    <header class="header-center">
+    <header>
         <a href="/" class="header-logo" aria-label="На главную">
             <img src="/static/img/logo.svg?v=neter" alt="НЭТЕР" class="header-logo__img">
         </a>
     </header>
-    <div class="detail-wrapper">
+    <div class="toolbar">
+        <form action="/" method="GET" class="toolbar__search-form">
+            <span class="search-bar">
+                <input type="text" name="query" class="search-input" placeholder="Поиск по типу аккумулятора" value="{{ .query }}">
+                <button type="submit" class="search-btn" aria-label="Найти">
+                    <svg class="search-btn__icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M16 16l4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </span>
+        </form>
+        <div class="cart-wrap">
+            {{ if .hasDraft }}
+            <a href="/battery-life/{{ .draftID }}" class="cart-button" aria-label="Текущая заявка">
+                <svg class="cart-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M7 4H5L4 6h2l3 9h9l3-7H13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="10" cy="19" r="1.5" fill="currentColor"/>
+                    <circle cx="17" cy="19" r="1.5" fill="currentColor"/>
+                </svg>
+                <span class="cart-button__label">{{ if gt .cartCount 0 }}{{ .cartCount }}{{ end }}</span>
+            </a>
+            {{ else }}
+            <span class="cart-button cart-button--disabled" aria-label="Нет черновика заявки">
+                <svg class="cart-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M7 4H5L4 6h2l3 9h9l3-7H13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="10" cy="19" r="1.5" fill="currentColor"/>
+                    <circle cx="17" cy="19" r="1.5" fill="currentColor"/>
+                </svg>
+                <span class="cart-button__label"></span>
+            </span>
+            {{ end }}
+        </div>
+    </div>
+    <div class="detail-wrapper detail-wrapper--battery">
         <a href="/" class="back-link">← Вернуться к списку товаров</a>
-        <div class="detail-card">
+        <div class="detail-card detail-card--split">
             <div class="detail-card__media">
-                <div class="detail-card__video-frame detail-card__video-frame--desc">
+                <div class="detail-card__video-frame detail-card__video-frame--desc" tabindex="0" role="region" aria-label="Видео и описание по наведению">
                     <video class="detail-card__video" controls autoplay muted loop playsinline>
                         <source src="http://localhost:9000/test/{{ .battery.Video }}" type="video/mp4">
                     </video>
                     <div class="detail-video-desc">
-                        <p class="detail-video-desc__text">{{ .videoDescriptionOverlay }}</p>
+                        <div class="detail-video-desc__rail">
+                            <div class="detail-video-desc__rail-panel">
+                                <div class="detail-stat detail-stat--rail">
+                                    <svg class="detail-stat__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <rect x="6" y="7" width="12" height="10" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                                        <path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                                        <path d="M10 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                    <span class="detail-stat__value">{{ .battery.CapacityMah }}</span>
+                                    <span class="detail-stat__unit">мА·ч</span>
+                                </div>
+                                <div class="detail-stat detail-stat--rail">
+                                    <svg class="detail-stat__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M13 2L4 14h7l-1 8 10-12h-7l0-8z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span class="detail-stat__value">{{ printf "%.1f" .battery.VoltageV }}</span>
+                                    <span class="detail-stat__unit">В</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="detail-video-desc__bottom">
+                            <h1 class="detail-video-desc__title">{{ .battery.Title }}</h1>
+                            <p class="detail-video-desc__short">{{ .battery.ShortDescription }}</p>
+                            <div class="detail-video-desc__metrics-text">
+                                <p class="detail-video-desc__metric-row"><strong>Ток:</strong> {{ .currentAStr }} А</p>
+                                <p class="detail-video-desc__metric-row"><strong>Время работы:</strong> {{ .runtimeHoursStr }} ч</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="detail-card__body">
-                <h1 class="detail-card__title">{{ .battery.Title }}</h1>
-                <p class="detail-card__employees">Ёмкость и напряжение: {{ .battery.CapacityMah }} мА·ч, {{ .battery.VoltageV }} В</p>
-                <form action="/battery-life/add" method="POST" class="add-to-cart-form">
+            <aside class="detail-card__actions">
+                <form action="/battery-life/add" method="POST" class="add-to-cart-form add-to-cart-form--aside">
                     <input type="hidden" name="battery_id" value="{{ .batteryID }}">
                     <input type="hidden" name="return_to" value="battery">
                     <label class="form-label">Количество: <input type="number" name="quantity" value="1" min="1" class="role-input" style="width:80px;"></label>
-                    <button type="submit" class="cart-button">Добавить в подборку</button>
+                    <button type="submit" class="cart-button cart-button--block">Добавить в заявку</button>
                 </form>
-            </div>
+            </aside>
         </div>
     </div>
 </html>

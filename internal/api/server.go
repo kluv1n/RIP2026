@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"RIP2026/lab_materials/docs"
+	"RIP2026/docs"
 	"RIP2026/internal/app/config"
 	"RIP2026/internal/app/handler"
 	"RIP2026/internal/app/repository"
@@ -15,9 +15,9 @@ import (
 )
 
 // StartServer godoc
-// @title Battery Life API
+// @title battery life API
 // @version 1.0
-// @description API для управления заявками расчета времени работы аккумуляторов
+// @description battery life — API для управления заявками расчёта времени работы аккумуляторов
 // @host localhost:8080
 // @BasePath /api
 // @securityDefinitions.apikey ApiKeyAuth

@@ -1,6 +1,6 @@
 <html lang="ru">
     <head>
-        <title>Подборка товаров — типы аккумуляторов</title>
+        <title>battery life — типы аккумуляторов</title>
         <link rel="stylesheet" href="/static/styles/index_style.css?v=neter8">
     </head>
     <header>
@@ -22,7 +22,7 @@
         </form>
         <div class="cart-wrap">
             {{ if .hasDraft }}
-            <a href="/battery-life/{{ .draftID }}" class="cart-button" aria-label="Текущая подборка товаров">
+            <a href="/battery-life/{{ .draftID }}" class="cart-button" aria-label="Текущая заявка">
                 <svg class="cart-button__icon" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M7 4H5L4 6h2l3 9h9l3-7H13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                     <circle cx="10" cy="19" r="1.5" fill="currentColor"/>
@@ -31,7 +31,7 @@
                 <span class="cart-button__label">{{ if gt .cartCount 0 }}{{ .cartCount }}{{ end }}</span>
             </a>
             {{ else }}
-            <span class="cart-button cart-button--disabled" aria-label="Нет текущей подборки">
+            <span class="cart-button cart-button--disabled" aria-label="Нет черновика заявки">
                 <svg class="cart-button__icon" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M7 4H5L4 6h2l3 9h9l3-7H13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                     <circle cx="10" cy="19" r="1.5" fill="currentColor"/>

@@ -15,12 +15,12 @@ import (
 // APIGetBatteryTypes godoc
 // @Summary Получить список аккумуляторов
 // @Description Возвращает все аккумуляторы или фильтрует по названию.
-// @Tags battery_types
+// @Tags battery life
 // @Produce json
 // @Param title query string false "Название аккумулятора для поиска"
 // @Success 200 {object} serializer.BatteryTypeListJSON
 // @Failure 500 {object} map[string]string
-// @Router /battery_types [get]
+// @Router /battery_life_types [get]
 func (h *Handler) APIGetBatteryTypes(ctx *gin.Context) {
 	title := ctx.Query("title")
 	if title == "" {
@@ -43,14 +43,14 @@ func (h *Handler) APIGetBatteryTypes(ctx *gin.Context) {
 // APIGetBatteryType godoc
 // @Summary Получить аккумулятор по ID
 // @Description Возвращает данные одного аккумулятора.
-// @Tags battery_types
+// @Tags battery life
 // @Produce json
 // @Param id path int true "ID аккумулятора"
 // @Success 200 {object} serializer.BatteryTypeJSON
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /battery_type/{id} [get]
+// @Router /battery_life_type/{id} [get]
 func (h *Handler) APIGetBatteryType(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -73,16 +73,16 @@ func (h *Handler) APIGetBatteryType(ctx *gin.Context) {
 // APICreateBatteryType godoc
 // @Summary Создать аккумулятор
 // @Description Создает новый тип аккумулятора. Доступно авторизованному пользователю.
-// @Tags battery_types
+// @Tags battery life
 // @Accept json
 // @Produce json
-// @Param battery_type body serializer.BatteryTypeJSON true "Данные аккумулятора"
+// @Param battery_life_type body serializer.BatteryTypeJSON true "Данные аккумулятора"
 // @Success 201 {object} serializer.BatteryTypeJSON
 // @Failure 400 {object} map[string]string
 // @Failure 401 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Security ApiKeyAuth
-// @Router /battery_type/create-battery_type [post]
+// @Router /battery_life_type/create-battery_life_type [post]
 func (h *Handler) APICreateBatteryType(ctx *gin.Context) {
 	contentType := ctx.GetHeader("Content-Type")
 	var j serializer.BatteryTypeJSON
@@ -136,6 +136,6 @@ func (h *Handler) APICreateBatteryType(ctx *gin.Context) {
 		}
 		bt = *updated
 	}
-	ctx.Header("Location", fmt.Sprintf("/api/battery_types/%d", bt.ID))
+	ctx.Header("Location", fmt.Sprintf("/api/battery_life_type/%d", bt.ID))
 	ctx.JSON(http.StatusCreated, serializer.BatteryTypeToJSON(bt))
 }

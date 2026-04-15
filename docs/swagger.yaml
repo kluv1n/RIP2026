@@ -1,0 +1,846 @@
+basePath: /api
+definitions:
+  RIP2026_internal_app_serializer.BatteryLifeItemJSON:
+    properties:
+      battery_life_id:
+        type: integer
+      battery_type_id:
+        type: integer
+      current_ma:
+        type: integer
+      quantity:
+        type: integer
+      runtime_hours:
+        type: number
+    type: object
+  RIP2026_internal_app_serializer.BatteryLifeJSON:
+    properties:
+      completed_at:
+        type: string
+      completed_item_count:
+        type: integer
+      created_at:
+        type: string
+      creator_login:
+        type: string
+      description:
+        type: string
+      formed_at:
+        type: string
+      id:
+        type: integer
+      moderator_login:
+        description: опционально, как в SystemLoadToJSON
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      total_runtime_hours:
+        type: number
+    type: object
+  RIP2026_internal_app_serializer.BatteryTypeJSON:
+    properties:
+      capacity_mah:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      is_deleted:
+        type: boolean
+      photo:
+        type: string
+      short_description:
+        type: string
+      title:
+        type: string
+      video:
+        type: string
+      voltage_v:
+        type: number
+    type: object
+  RIP2026_internal_app_serializer.BatteryTypeListJSON:
+    properties:
+      ids:
+        items:
+          type: integer
+        type: array
+      items:
+        items:
+          $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryTypeJSON'
+        type: array
+    type: object
+  RIP2026_internal_app_serializer.SignInRequest:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  RIP2026_internal_app_serializer.SignInResponse:
+    properties:
+      role:
+        description: moderator | creator
+        type: string
+      token:
+        type: string
+    type: object
+  RIP2026_internal_app_serializer.SignUpRequest:
+    properties:
+      is_moderator:
+        type: boolean
+      login:
+        type: string
+      password:
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  RIP2026_internal_app_serializer.SignUpResponse:
+    properties:
+      login:
+        type: string
+      role:
+        description: moderator | creator
+        type: string
+    type: object
+  RIP2026_internal_app_serializer.StatusJSON:
+    properties:
+      status:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: battery life — API для управления заявками расчёта времени работы аккумуляторов
+  title: battery life API
+  version: "1.0"
+paths:
+  /battery_life/{id}:
+    get:
+      description: Возвращает полную информацию о заявке и ее позициях.
+      parameters:
+      - description: ID заявки
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Получить заявку по ID
+      tags:
+      - battery life
+  /battery_life/{id}/delete-battery_life:
+    delete:
+      description: Выполняет логическое удаление черновика заявки.
+      parameters:
+      - description: ID заявки
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Удалить заявку
+      tags:
+      - battery life
+  /battery_life/{id}/edit-battery_life:
+    put:
+      consumes:
+      - application/json
+      description: Обновляет данные черновика заявки.
+      parameters:
+      - description: ID заявки
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Новые данные заявки
+        in: body
+        name: battery_life
+        required: true
+        schema:
+          $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryLifeJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryLifeJSON'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Изменить заявку
+      tags:
+      - battery life
+  /battery_life/{id}/finish-battery_life:
+    put:
+      consumes:
+      - application/json
+      description: Изменяет статус заявки на `completed` или `rejected`. Доступно
+        только модератору.
+      parameters:
+      - description: ID заявки
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Новый статус заявки
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/RIP2026_internal_app_serializer.StatusJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryLifeJSON'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Завершить заявку
+      tags:
+      - battery life
+  /battery_life/{id}/form-battery_life:
+    put:
+      description: Переводит черновик в статус `formed`.
+      parameters:
+      - description: ID заявки
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryLifeJSON'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Сформировать заявку
+      tags:
+      - battery life
+  /battery_life/all-battery_life:
+    get:
+      description: Возвращает заявки пользователя, а для модератора - все заявки.
+        Поддерживает фильтрацию по датам и статусу.
+      parameters:
+      - description: Начальная дата (YYYY-MM-DD)
+        in: query
+        name: from-date
+        type: string
+      - description: Конечная дата (YYYY-MM-DD)
+        in: query
+        name: to-date
+        type: string
+      - description: Статус заявки
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryLifeJSON'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Получить список заявок
+      tags:
+      - battery life
+  /battery_life/battery_life-cart:
+    get:
+      description: Возвращает информацию о текущем черновике пользователя или статус
+        `no_draft`.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Получить корзину заявки
+      tags:
+      - battery life
+  /battery_life_item/{battery_life_type_id}/{battery_life_id}:
+    delete:
+      description: Удаляет позицию из черновика заявки.
+      parameters:
+      - description: ID типа аккумулятора
+        in: path
+        name: battery_life_type_id
+        required: true
+        type: integer
+      - description: ID заявки
+        in: path
+        name: battery_life_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryLifeJSON'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Удалить аккумулятор из заявки
+      tags:
+      - battery life
+    put:
+      consumes:
+      - application/json
+      description: Обновляет ток и количество для позиции в черновике заявки.
+      parameters:
+      - description: ID типа аккумулятора
+        in: path
+        name: battery_life_type_id
+        required: true
+        type: integer
+      - description: ID заявки
+        in: path
+        name: battery_life_id
+        required: true
+        type: integer
+      - description: Новые данные позиции
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryLifeItemJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryLifeItemJSON'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Изменить позицию в заявке
+      tags:
+      - battery life
+  /battery_life_item/add/{battery_life_type_id}:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет аккумулятор в черновик пользователя. При отсутствии черновика
+        он создается.
+      parameters:
+      - description: ID типа аккумулятора
+        in: path
+        name: battery_life_type_id
+        required: true
+        type: integer
+      - description: Параметры позиции
+        in: body
+        name: item
+        schema:
+          $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryLifeItemJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryLifeJSON'
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryLifeJSON'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Добавить аккумулятор в заявку
+      tags:
+      - battery life
+  /battery_life_type/{id}:
+    get:
+      description: Возвращает данные одного аккумулятора.
+      parameters:
+      - description: ID аккумулятора
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryTypeJSON'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить аккумулятор по ID
+      tags:
+      - battery life
+  /battery_life_type/create-battery_life_type:
+    post:
+      consumes:
+      - application/json
+      description: Создает новый тип аккумулятора. Доступно авторизованному пользователю.
+      parameters:
+      - description: Данные аккумулятора
+        in: body
+        name: battery_life_type
+        required: true
+        schema:
+          $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryTypeJSON'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryTypeJSON'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Создать аккумулятор
+      tags:
+      - battery life
+  /battery_life_types:
+    get:
+      description: Возвращает все аккумуляторы или фильтрует по названию.
+      parameters:
+      - description: Название аккумулятора для поиска
+        in: query
+        name: title
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RIP2026_internal_app_serializer.BatteryTypeListJSON'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить список аккумуляторов
+      tags:
+      - battery life
+  /users/signin:
+    post:
+      consumes:
+      - application/json
+      description: Принимает логин/пароль, возвращает token и role (moderator|creator).
+      parameters:
+      - description: Логин и пароль
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/RIP2026_internal_app_serializer.SignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RIP2026_internal_app_serializer.SignInResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Вход (получение токена)
+      tags:
+      - battery life
+  /users/signout:
+    post:
+      description: Удаляет токен текущего пользователя из blacklist. 204 No Content.
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Токен добавлен в blacklist
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Выход (удаление токена)
+      tags:
+      - battery life
+  /users/signup:
+    post:
+      consumes:
+      - application/json
+      description: Регистрирует нового пользователя. Возвращает login и role (moderator|creator).
+      parameters:
+      - description: Логин и пароль
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/RIP2026_internal_app_serializer.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/RIP2026_internal_app_serializer.SignUpResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Регистрация пользователя
+      tags:
+      - battery life
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

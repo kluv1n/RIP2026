@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"RIP2026/internal/app/repository"
 	"github.com/gin-gonic/gin"
@@ -40,6 +41,20 @@ func NewHandler(r *repository.Repository) *Handler {
 	return &Handler{Repository: r}
 }
 
+// demoLoadMaForCapacity — типовой ток (мА) для блока «Ток / время» на карточке; часы = мА·ч / мА.
+func demoLoadMaForCapacity(capacityMah int) int {
+	switch {
+	case capacityMah >= 2800:
+		return 500
+	case capacityMah >= 2000:
+		return 200
+	case capacityMah >= 1400:
+		return 250
+	default:
+		return 100
+	}
+}
+
 func (h *Handler) GetBatteryTypes(ctx *gin.Context) {
 	creatorID := uint(h.Repository.GetCreatorID())
 	var batteries []repository.BatteryType
@@ -55,7 +70,7 @@ func (h *Handler) GetBatteryTypes(ctx *gin.Context) {
 		logrus.Error(err)
 	}
 
-	batteryLives, err := h.Repository.GetBatteryLives(creatorID)
+	batteryLifeList, err := h.Repository.GetBatteryLives(creatorID)
 	if err != nil {
 		logrus.Error(err)
 	}
@@ -70,7 +85,7 @@ func (h *Handler) GetBatteryTypes(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "index.html", gin.H{
 		"batteries":    batteries,
 		"query":        searchQuery,
-		"batteryLives": batteryLives,
+		"batteryLifeList": batteryLifeList,
 		"draftID":      draftIDInt,
 		"hasDraft":     hasDraft,
 		"cartCount":    cartCount,
@@ -97,12 +112,30 @@ func (h *Handler) GetBattery(ctx *gin.Context) {
 	batteryLifeItem, _ := h.Repository.GetBatteryLifeForBattery(id, creatorID)
 	hasInBatteryLife := batteryLifeItem != nil
 
+	draftID, hasDraft := h.Repository.GetDraftID(creatorID)
+	draftIDInt := 0
+	if hasDraft {
+		draftIDInt = int(draftID)
+	}
+	cartCount := h.Repository.GetCartCount(creatorID)
+
+	loadMa := demoLoadMaForCapacity(battery.CapacityMah)
+	hours := repository.RuntimeHours(battery.CapacityMah, loadMa)
+	currentA := float64(loadMa) / 1000.0
+	currentAStr := strings.Replace(fmt.Sprintf("%.2f", currentA), ".", ",", 1)
+	runtimeHoursStr := strings.Replace(fmt.Sprintf("%.1f", hours), ".", ",", 1)
+
 	ctx.HTML(http.StatusOK, "battery.html", gin.H{
-		"battery":                 battery,
-		"batteryLifeItem":         batteryLifeItem,
-		"hasInBatteryLife":        hasInBatteryLife,
-		"batteryID":               id,
-		"videoDescriptionOverlay": descriptionForVideoOverlay(battery.Description),
+		"battery":           battery,
+		"batteryLifeItem":   batteryLifeItem,
+		"hasInBatteryLife":  hasInBatteryLife,
+		"batteryID":         id,
+		"currentAStr":       currentAStr,
+		"runtimeHoursStr":   runtimeHoursStr,
+		"query":             "",
+		"draftID":           draftIDInt,
+		"hasDraft":          hasDraft,
+		"cartCount":         cartCount,
 	})
 }
 
@@ -176,9 +209,9 @@ func (h *Handler) DeleteBatteryLife(ctx *gin.Context) {
 }
 
 // RegisterAPI godoc
-// @title Battery Life API
+// @title battery life API
 // @version 1.0
-// @description API для управления заявками расчета времени работы аккумуляторов
+// @description battery life — API для управления заявками расчёта времени работы аккумуляторов
 // @host localhost:8080
 // @BasePath /api
 // @securityDefinitions.apikey ApiKeyAuth
@@ -190,8 +223,8 @@ func (h *Handler) RegisterAPI(router *gin.Engine) {
 
 	public := api.Group("/")
 	{
-		public.GET("/battery_types", h.APIGetBatteryTypes)
-		public.GET("/battery_type/:id", h.APIGetBatteryType)
+		public.GET("/battery_life_types", h.APIGetBatteryTypes)
+		public.GET("/battery_life_type/:id", h.APIGetBatteryType)
 		public.POST("/users/signup", h.APICreateUser)
 		public.POST("/users/signin", h.APISignIn)
 	}
@@ -205,15 +238,15 @@ func (h *Handler) RegisterAPI(router *gin.Engine) {
 	authorized := api.Group("/")
 	authorized.Use(h.AuthMiddleware(false))
 	{
-		authorized.POST("/battery_type/create-battery_type", h.APICreateBatteryType)
-		authorized.GET("/battery_life/all-battery_lives", h.APIGetBatteryLives)
+		authorized.POST("/battery_life_type/create-battery_life_type", h.APICreateBatteryType)
+		authorized.GET("/battery_life/all-battery_life", h.APIGetBatteryLives)
 		authorized.GET("/battery_life/:id", h.APIGetBatteryLife)
 		authorized.PUT("/battery_life/:id/edit-battery_life", h.APIEditBatteryLife)
 		authorized.PUT("/battery_life/:id/form-battery_life", h.APIFormBatteryLife)
 		authorized.DELETE("/battery_life/:id/delete-battery_life", h.APIDeleteBatteryLife)
-		authorized.POST("/battery_life_item/add/:battery_type_id", h.APIAddToBatteryLife)
-		authorized.DELETE("/battery_life_item/:battery_type_id/:battery_life_id", h.APIDeleteFromBatteryLife)
-		authorized.PUT("/battery_life_item/:battery_type_id/:battery_life_id", h.APIEditInBatteryLife)
+		authorized.POST("/battery_life_item/add/:battery_life_type_id", h.APIAddToBatteryLife)
+		authorized.DELETE("/battery_life_item/:battery_life_type_id/:battery_life_id", h.APIDeleteFromBatteryLife)
+		authorized.PUT("/battery_life_item/:battery_life_type_id/:battery_life_id", h.APIEditInBatteryLife)
 		authorized.POST("/users/signout", h.APISignOut)
 	}
 

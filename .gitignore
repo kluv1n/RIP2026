@@ -20,9 +20,8 @@ vendor/
 *.tar.gz
 *.zip
 
-# Postman
+# Postman (локальные коллекции / экспорты)
 postman/
-RIP2026_Lab3_Postman_Collection.json
 
 # Local lab materials
 lab_materials/

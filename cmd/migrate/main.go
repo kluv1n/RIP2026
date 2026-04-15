@@ -10,11 +10,7 @@ import (
 
 func main() {
 	_ = godotenv.Load()
-	dsnStr := dsn.FromEnv()
-	if dsnStr == "" {
-		panic("set DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME in .env")
-	}
-	db, err := gorm.Open(postgres.Open(dsnStr), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn.FromEnv()), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database: " + err.Error())
 	}

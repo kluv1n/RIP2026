@@ -11,7 +11,7 @@ const (
 	StatusRejected  = "rejected"
 )
 
-// BatteryLife — заявка (расчёт времени работы): id, статус, дата создания, создатель; даты формирования/завершения, модератор
+// BatteryLife — сущность battery life (заявка, расчёт времени работы): id, статус, дата создания, создатель; даты формирования/завершения, модератор
 type BatteryLife struct {
 	ID                uint       `gorm:"primaryKey"`
 	Status            string     `gorm:"type:varchar(20);not null"`

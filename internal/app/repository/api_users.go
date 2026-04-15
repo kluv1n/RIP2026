@@ -90,7 +90,11 @@ func GenerateToken(userID uint, isModerator bool) (string, error) {
 	claims := token.Claims.(jwt.MapClaims)
 	claims["authorized"] = true
 	claims["user_id"] = fmt.Sprintf("%d", userID)
-	claims["is_moderator"] = isModerator
+	if isModerator {
+		claims["role"] = "moderator"
+	} else {
+		claims["role"] = "creator"
+	}
 	claims["exp"] = time.Now().Add(time.Hour).Unix()
 
 	jwtKey := os.Getenv("JWT_KEY")
