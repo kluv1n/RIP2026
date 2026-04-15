@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#d2dde4"/>
+  <rect x="60" y="100" width="280" height="100" rx="16" fill="#0a3141"/>
+  <rect x="80" y="118" width="240" height="64" rx="10" fill="#2CB4C2" opacity=".85"/>
+  <text x="200" y="255" text-anchor="middle" fill="#0a3141" font-family="Manrope,sans-serif" font-size="14" font-weight="700">LiFePO₄ · НЭТЕР</text>
+</svg>
