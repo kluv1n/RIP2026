@@ -1,0 +1,14 @@
+/* Form.Control даёт .form-control — возвращаем вид как у нативного input в .search-bar */
+.battery-types-filter-bar__form .search-bar .form-control.search-input {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--neter-text);
+}
+
+.battery-types-filter-bar__form .search-bar .form-control.search-input:focus {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  color: var(--neter-text);
+}

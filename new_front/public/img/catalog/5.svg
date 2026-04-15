@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#F6F8FA"/>
+  <rect x="100" y="60" width="200" height="180" rx="8" fill="#ffffff" stroke="#0a3141" stroke-width="3"/>
+  <rect x="120" y="85" width="160" height="130" rx="4" fill="#006baa" opacity=".2"/>
+  <text x="200" y="255" text-anchor="middle" fill="#0a3141" font-family="Manrope,sans-serif" font-size="14" font-weight="700">AGM 12В · НЭТЕР</text>
+</svg>

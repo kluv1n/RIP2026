@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0a3141"/><stop offset="100%" stop-color="#2CB4C2"/></linearGradient></defs>
+  <rect width="400" height="300" fill="#d2dde4"/>
+  <rect x="120" y="70" width="160" height="160" rx="12" fill="url(#g)"/>
+  <rect x="145" y="95" width="110" height="110" rx="8" fill="#F6F8FA" opacity=".25"/>
+  <text x="200" y="255" text-anchor="middle" fill="#0a3141" font-family="Manrope,sans-serif" font-size="14" font-weight="700">18650 · НЭТЕР</text>
+</svg>

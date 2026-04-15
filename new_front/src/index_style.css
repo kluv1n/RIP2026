@@ -1,0 +1,13 @@
+/* Только ваш фронт: resources/styles/index_style.css (копия в lab-index-style.css) */
+@import "./lab-index-style.css";
+
+#root {
+  min-height: 100vh;
+}
+
+.application-not-found {
+  text-align: center;
+  color: var(--neter-text-muted);
+  max-width: 1200px;
+  margin: 0 auto;
+}
